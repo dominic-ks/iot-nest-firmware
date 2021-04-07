@@ -64,7 +64,13 @@ export class DaikinAcService implements VirtualDevice {
 
       },
       error => {
-        console.log( 'error' , error.response.statusText );
+
+        if( typeof( error.response ) !== 'undefined' && typeof( error.response.statusText ) !== 'undefined' ) {
+          return console.log( 'error' , error.response.statusText );
+        }
+
+        return console.log( 'error' , error );
+
       }
     );
 
