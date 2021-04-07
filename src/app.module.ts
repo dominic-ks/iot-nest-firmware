@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, HttpModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
@@ -7,10 +7,13 @@ import { AuthService } from './services/auth/auth.service';
 import { MqttHandlerService } from './services/mqtt-handler/mqtt-handler.service';
 import { DevicesService } from './services/devices/devices.service';
 import { DaikinAcService } from './services/daikin-ac/daikin-ac.service';
+import { AppMessagesService } from './services/app-messages/app-messages.service';
+import { UtilityService } from './services/utility/utility.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    HttpModule,
   ],
   controllers: [
     AppController,
@@ -20,7 +23,9 @@ import { DaikinAcService } from './services/daikin-ac/daikin-ac.service';
     AuthService,
     MqttHandlerService,
     DevicesService,
-    DaikinAcService
+    DaikinAcService,
+    AppMessagesService,
+    UtilityService
   ],
 })
 export class AppModule {}

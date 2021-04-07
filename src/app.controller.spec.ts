@@ -1,12 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 
 import { AuthService } from './services/auth/auth.service';
-import { DevicesService } from './services/devices/devices.service';
 import { MqttHandlerService } from './services/mqtt-handler/mqtt-handler.service';
 
+import { MqttConnectionOptions } from './classes/mqtt-connection-options/mqtt-connection-options';
+
 jest.useFakeTimers();
-console.log = jest.fn()
 
 describe('AppController', () => {
   let appController: AppController;
@@ -17,25 +18,14 @@ describe('AppController', () => {
       controllers: [
         AppController
       ],
+      imports: [
+        ConfigModule.forRoot(),
+      ],
       providers: [
         AuthService,
-        DevicesService,
+        ConfigService,
         { provide: MqttHandlerService , useValue: {
-          getMqttClient: ( connectionArgs ) => {
-            return {
-              on: ( type: string , callback: Function ) => {
-
-                if( type === 'connect' ) {
-                  callback( true );
-                }
-
-                return true;
-
-              },
-              publish: ( mqttTopic: string , jsonPayload: string , options: Object ) => true,
-              subscribe: ( path: string ) => true,
-            }
-          }
+          setupMqttClient: ( connectionArgs: MqttConnectionOptions , deviceId: string , mqttTopic: string ) => true,
         }},
       ],
     }).compile();
@@ -45,12 +35,7 @@ describe('AppController', () => {
   });
 
   it( 'should bootstrap the app' , () => {
-
     expect( appController ).toBeDefined();
-
-    expect( setTimeout ).toHaveBeenCalledTimes( 1 );
-    expect( setTimeout ).toHaveBeenLastCalledWith( expect.any( Function ) , 30000 );
-
   });
 
 });

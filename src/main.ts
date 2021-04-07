@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 
 async function bootstrap() {
   const app = await NestFactory.create( AppModule );
-  const appController = app.get( AppController );
+  //const appController = app.get( AppController );
 }
 
 bootstrap();

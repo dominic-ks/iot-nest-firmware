@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { VirtualDevice } from '../../interfaces/virtual-device.interface';
 
 import { DaikinAcService } from '../daikin-ac/daikin-ac.service';
+import { UtilityService } from '../utility/utility.service';
 
 import { Device } from '../../classes/device/device';
 import { DeviceInterfaceClassDefinition } from '../../classes/device-interface-class-definition/device-interface-class-definition';
@@ -16,12 +17,9 @@ export class DevicesService {
 
   public currentDevices = this.devices.asObservable();
 
-  constructor() {
-    this.addDevicesToStore({
-      id: 'sub-device-001',
-      type: 'daikin-ac-unit',
-    });
-  }
+  constructor(
+    private readonly utilityService: UtilityService,
+  ) { }
 
   addDevicesToStore( device: Device ): void {
     this.devicesStore.push( this.getDeviceInterface( device ));
@@ -38,7 +36,7 @@ export class DevicesService {
     }
 
     const deviceClass = deviceInterfaceClassDefinition[0].class;
-    const deviceObject = new deviceClass();
+    const deviceObject = new deviceClass( this.utilityService );
 
     deviceObject.setDevice( device );
     return deviceObject;
@@ -51,10 +49,8 @@ export class DevicesService {
     ]
   }
 
-  getDeviceInterfaceClassList() {
-    return [
-      DaikinAcService
-    ]
+  getDeviceStore(): VirtualDevice[] {
+    return this.devicesStore;
   }
 
 }

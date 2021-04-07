@@ -1,28 +1,113 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpService } from '@nestjs/common';
+import { forkJoin } from 'rxjs';
+
 import { VirtualDevice } from '../../interfaces/virtual-device.interface';
 
+import { AppMessagesService } from '../app-messages/app-messages.service';
+import { UtilityService } from '../utility/utility.service';
+
 import { Device } from '../../classes/device/device';
+
+class DaikinAcDevice extends Device {
+  address: string;
+  id: string;
+  type: string;
+}
+
+class DaikinAcDeviceSensorInfo {
+
+}
 
 @Injectable()
 export class DaikinAcService implements VirtualDevice {
 
-  public deviceInfo: Device;
+  private appMessagesService: AppMessagesService;
+  private httpService: HttpService;
+  public deviceInfo: DaikinAcDevice;
+
+  constructor(
+    private utilityService: UtilityService,
+  ) {
+    this.appMessagesService = this.utilityService.appMessagesService;
+    this.httpService = this.utilityService.httpService;
+  }
 
   getDeviceTypeName() {
     return 'Daikin AC Unit';
   }
 
-  getTelemtryData(): Object {
-    return {
-      temp: 20,
-      humd: 0,
-      time: new Date().toISOString().slice( 0 , 19 ).replace( 'T' , ' ' ),
-      power: 'ON',
-    };
+  getSensorInfo(): void {
+
+    let controlInfo = this.httpService.get( this.deviceInfo.address + '/aircon/get_control_info' );
+    let sensorInfo = this.httpService.get( this.deviceInfo.address + '/aircon/get_sensor_info' );
+
+    forkJoin([ controlInfo , sensorInfo ]).subscribe(
+      resp => {
+
+        let responseData = {}
+
+        for( let response of resp ) {
+          let responseSplit = response.data.split( ',' );
+
+          for( let responseValue of responseSplit ) {
+            let responsePairs = responseValue.split( '=' );
+            responseData[ responsePairs[0] ] = responsePairs[1];
+          }
+
+        }
+
+        this.setDeviceData( responseData );
+
+        setTimeout(() => {
+          this.getSensorInfo();
+        }, 5000 );
+
+      },
+      error => {
+        console.log( 'error' , error );
+      }
+    );
+
   }
 
-  setDevice( device: Device ): void {
+  setDevice( device: DaikinAcDevice ): void {
     this.deviceInfo = device;
+    this.getSensorInfo();
+  }
+
+  setDeviceData( data: any ) {
+
+    let dataChanged = false;
+
+    if( typeof( this.deviceInfo.data ) === 'undefined' ) {
+      this.deviceInfo.data = {};
+    }
+
+    for( let deviceProperty in data ) {
+      let devicePropertyValue = data[ deviceProperty ];
+
+      if( typeof( this.deviceInfo.data[ deviceProperty ]) !== 'undefined' && this.deviceInfo.data[ deviceProperty ] === devicePropertyValue ) {
+        continue;
+      }
+
+      dataChanged = true;
+      this.deviceInfo.data[ deviceProperty ] = devicePropertyValue;
+
+    }
+
+    if( ! dataChanged ) {
+      return;
+    }
+
+    this.sendData();
+
+  }
+
+  sendData() {
+    this.appMessagesService.broadcastMessage({
+      data: this.deviceInfo,
+      type: 'mqtt-send',
+    });
   }
 
 }
