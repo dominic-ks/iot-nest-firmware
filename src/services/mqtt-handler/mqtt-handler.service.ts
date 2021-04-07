@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { filter } from 'rxjs/operators';
+
+import { Algorithm } from 'jsonwebtoken';
 
 import * as mqtt from 'mqtt';
 import { MqttClient } from 'mqtt';
 
 import { AppMessagesService } from '../app-messages/app-messages.service';
+import { AuthService } from '../auth/auth.service';
 import { DevicesService } from '../devices/devices.service';
 
 import { AppMessage } from '../../classes/app-message/app-message';
@@ -15,13 +19,26 @@ const deviceList = require( '../../../devices.json' );
 @Injectable()
 export class MqttHandlerService {
 
+  private algorithm: Algorithm;
+  private cloudRegion: string;
   private connectionArgs: MqttConnectionOptions;
   private deviceId: string;
+  private messageType: string;
+  private mqttClientId: string;
   private mqttClient: MqttClient;
+  private mqttHost: string;
+  private mqttPort: number;
   private mqttTopic: string;
+  private privateKeyFile: string;
+  private projectId: string;
+  private registryId: string;
+
+  private messageQueue: any[];
 
   constructor(
     private appMessagesService: AppMessagesService,
+    private authService: AuthService,
+    private configService: ConfigService,
     private devicesService: DevicesService,
   ) {
 
@@ -33,6 +50,45 @@ export class MqttHandlerService {
         this.sendData( resp.data );
       }
     );
+
+    this.algorithm = this.configService.get<Algorithm>( 'ALGORHYTHM' );
+    this.cloudRegion = this.configService.get<string>( 'CLOUDREGION' );
+    this.deviceId = this.configService.get<string>( 'DEVICEID' );
+    this.messageType = this.configService.get<string>( 'MESSAGETYPE' );
+    this.mqttHost = this.configService.get<string>( 'MQTTHOST' );
+    this.mqttPort = this.configService.get<number>( 'MQTTPORT' );
+    this.privateKeyFile = this.configService.get<string>( 'PRIVATEKEYFILE' );
+    this.projectId = this.configService.get<string>( 'PROJECTID' );
+    this.registryId = this.configService.get<string>( 'REGISTRYID' );
+
+    this.mqttClientId = 'projects/' + this.projectId + '/locations/' + this.cloudRegion + '/registries/' + this.registryId + '/devices/' + this.deviceId;
+    this.mqttTopic = '/devices/' + this.deviceId + '/' + this.messageType;
+
+    this.connectionArgs = {
+      host: this.mqttHost,
+      port: this.mqttPort,
+      clientId: this.mqttClientId,
+      username: 'unused',
+      password: this.authService.createJwt( this.projectId , this.privateKeyFile , this.algorithm ),
+      protocol: 'mqtts',
+      secureProtocol: 'TLSv1_2_method'
+    };
+
+  }
+
+  checkToken() {
+
+    if( this.authService.validateJwt( this.connectionArgs.password , this.privateKeyFile , this.algorithm )) {
+      console.log( 'jwt is valid' );
+      return;
+    }
+
+    console.log( 'jwt is invalid, regenerating...' );   
+    this.connectionArgs.password = this.authService.createJwt( this.projectId , this.privateKeyFile , this.algorithm );
+
+    delete this.mqttClient;
+
+    this.setupMqttClient();
 
   }
 
@@ -74,20 +130,18 @@ export class MqttHandlerService {
 
     const jsonPayload = JSON.stringify( payload );
 
-    console.log( this.mqttTopic , ': Publishing message:' , payload );
+    this.checkToken();
+
+    console.log( this.mqttTopic , ': Publishing message' );
     this.mqttClient.publish( this.mqttTopic , jsonPayload , { qos: 1 });
 
   }
 
-  async setupMqttClient( connectionArgs: MqttConnectionOptions , deviceId: string , mqttTopic: string ): Promise<void> {
+  setupMqttClient(): void {
 
-    this.deviceId = deviceId;
-    this.mqttTopic = mqttTopic;
+    this.mqttClient = this.getMqttClient( this.connectionArgs );
 
-    this.connectionArgs = connectionArgs;
-    this.mqttClient = this.getMqttClient( connectionArgs );
-
-    await this.mqttClient.subscribe( '/devices/' + this.deviceId + '/config' );
+    this.mqttClient.subscribe( '/devices/' + this.deviceId + '/config' );
 
     this.mqttClient.on( 'close' , this.onClose.bind( this ));
     this.mqttClient.on( 'connect' , this.onConnect.bind( this ));

@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Observable } from 'rxjs';
 import { MqttHandlerService } from './mqtt-handler.service';
 
 import { AppMessagesService } from '../app-messages/app-messages.service';
+import { AuthService } from '../auth/auth.service';
 import { DevicesService } from '../devices/devices.service';
 import { UtilityService } from '../utility/utility.service';
 
@@ -32,23 +34,15 @@ jest.mock( 'mqtt' , () => {
 describe( 'MqttHandlerService' , () => {
   let service: MqttHandlerService;
 
-  let testConnectionOptions = {
-    host: 'test-host',
-    port: 123,
-    clientId: 'test-client-id',
-    username: 'test-username',
-    password: 'test-password',
-    protocol: 'SHA',
-    secureProtocol: 'SHA',
-  }
-
-  let testDeviceId = 'test-device-001';
-  let testTopic = 'test-topic';
-
   beforeEach( async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot(),
+      ],
       providers: [
         AppMessagesService,
+        AuthService,
+        ConfigService,
         MqttHandlerService,
         DevicesService,
         { provide: UtilityService , useValue: {
@@ -80,7 +74,7 @@ describe( 'MqttHandlerService' , () => {
 
     let getSpy = jest.spyOn( service , 'getMqttClient' );
 
-    await service.setupMqttClient( testConnectionOptions , testDeviceId , testTopic );
+    await service.setupMqttClient();
     expect( getSpy ).toHaveBeenCalledTimes( 1 );
 
     await service.disconnect();

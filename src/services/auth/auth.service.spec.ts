@@ -5,6 +5,9 @@ describe( 'AuthService' , () => {
   let service: AuthService;
 
   const privateKeyFile = 'D:/OneDrive/Dropbox Transfer/Business Plans/Web Development/Google Cloud/iot/device-001/rsa_private.pem';
+  const testToken = {
+    some: 'data',
+  }
 
   beforeEach( async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,8 +23,16 @@ describe( 'AuthService' , () => {
     expect( service ).toBeDefined();
   });
 
-  it( 'should create a jwt' , () => {
-    expect( service.createJwt( 'my-project' , privateKeyFile , 'RS256' )).toBeTruthy();
+  it( 'should create and decode a jwt' , () => {
+
+    let token = service.createJwt( 'my-project' , privateKeyFile , 'RS256' );
+    let decoded = service.validateJwt( token , privateKeyFile , 'RS256' );
+    let failedDecoded = service.validateJwt( token , 'blahblahblah' , 'RS256' );
+
+    expect( token ).toBeTruthy();
+    expect( decoded ).toBeTruthy();
+    expect( failedDecoded ).toBeFalsy();
+
   });
 
 });
