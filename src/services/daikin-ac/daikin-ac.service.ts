@@ -60,7 +60,7 @@ export class DaikinAcService implements VirtualDevice {
 
         setTimeout(() => {
           this.getSensorInfo();
-        }, 5000 );
+        }, 30000 );
 
       },
       error => {
