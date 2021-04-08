@@ -4,4 +4,5 @@ export interface VirtualDevice {
   deviceInfo: Device;
   getDeviceTypeName: () => string;
   setDevice: ( device: Device ) => void;
+  setDeviceData: ( data: any ) =>void;
 }

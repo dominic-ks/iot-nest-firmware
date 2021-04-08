@@ -22,8 +22,19 @@ export class DevicesService {
   ) { }
 
   addDevicesToStore( device: Device ): void {
-    this.devicesStore.push( this.getDeviceInterface( device ));
+
+    let matchedDevices = this.devicesStore.filter( virtualDevice => virtualDevice.deviceInfo.id === device.id );
+
+    if( matchedDevices.length === 0 ) {
+      this.devicesStore.push( this.getDeviceInterface( device ));
+      return;
+    }
+
+    let matchedDevice = matchedDevices[0];
+    matchedDevice.setDeviceData( device.data );
+
     this.devices.next( this.devicesStore );
+
   }
 
   getDeviceInterface( device: Device ): VirtualDevice {
