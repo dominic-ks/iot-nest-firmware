@@ -83,9 +83,10 @@ export class MqttHandlerService {
       return;
     }
 
-    console.log( 'jwt is invalid, regenerating...' );   
+    console.log( 'jwt is invalid, regenerating...' );
     this.connectionArgs.password = this.authService.createJwt( this.projectId , this.privateKeyFile , this.algorithm );
 
+    this.disconnect();
     delete this.mqttClient;
 
     this.setupMqttClient();
