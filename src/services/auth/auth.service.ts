@@ -35,6 +35,7 @@ export class AuthService {
     }
 
     catch( e ) {
+      console.log( 'JWT Validation Error: ' , e );
       return false;
     }
 
