@@ -1,9 +1,10 @@
 export class MqttConnectionOptions {
-  host: string;
-  port: number;
+  clean?: boolean;
   clientId: string;
-  username: string;
+  host: string;
   password: string;
+  port: number;
   protocol: string;
   secureProtocol: string;
+  username: string;
 }
