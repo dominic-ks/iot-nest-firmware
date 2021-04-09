@@ -42,25 +42,23 @@ describe( 'AuthService' , () => {
     expect( service ).toBeDefined();
   });
 
-  it( 'should create and decode a jwt' , () => {
+  it( 'should create and validate a jwt' , () => {
 
     let token = service.createJwt( 'my-project' , privateKeyFile , 'RS256' );
-    let decoded = service.validateJwt( token , privateKeyFile , 'RS256' );
-    let failedDecoded = service.validateJwt( token , 'blahblahblah' , 'RS256' );
+    let decoded = service.validateJwt( token );
 
     expect( token ).toBeTruthy();
     expect( decoded ).toBeTruthy();
-    expect( failedDecoded ).toBeFalsy();
 
   });
 
   it( 'should validate a token that has not expired' , () => {
-    let validatedToken = service.validateJwt( validToken , privateKeyFile , 'RS256' );
+    let validatedToken = service.validateJwt( validToken );
     expect( validatedToken ).toBeTruthy();
   });
 
   it( 'should fail to validate an expired token' , () => {
-    let failedDecoded = service.validateJwt( expiredToken , privateKeyFile , 'RS256' );
+    let failedDecoded = service.validateJwt( expiredToken );
     expect( failedDecoded ).toBeFalsy();
   });
 

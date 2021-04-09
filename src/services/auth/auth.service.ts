@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Algorithm, sign , verify } from 'jsonwebtoken';
+import { Algorithm, decode, sign , verify } from 'jsonwebtoken';
 import * as fs from 'fs';
 
 @Injectable()
@@ -26,12 +26,20 @@ export class AuthService {
 
   }
 
-  validateJwt( jwt: string , privateKeyFile: string , algorithm: Algorithm  ): boolean {
+  validateJwt( jwt: string ): boolean {
 
     try {
-      const privateKey = fs.readFileSync( privateKeyFile );
-      const decoded = verify( jwt , privateKey , { algorithms: [ algorithm ] });
+
+      const decodedToken = decode( jwt )
+      const now = Date.now() / 1000;
+      const timeSinceExp = now - decodedToken['exp'];
+
+      if( timeSinceExp > 0 ) {
+        return false;
+      };
+
       return true;
+
     }
 
     catch( e ) {
