@@ -76,29 +76,31 @@ export class MqttHandlerService {
 
   }
 
-  checkToken() {
+  disconnect(): void {
+    this.mqttClient.end();
+  }
+
+  getMqttClient(): MqttClient {
+
+    let tokenIsValid = false;
 
     if( this.authService.validateJwt( this.connectionArgs.password , this.privateKeyFile , this.algorithm )) {
       console.log( 'jwt is valid' );
-      return;
+      tokenIsValid = true;
     }
 
-    console.log( 'jwt is invalid, regenerating...' );
-    this.connectionArgs.password = this.authService.createJwt( this.projectId , this.privateKeyFile , this.algorithm );
+    if( ! tokenIsValid && typeof( this.mqttClient ) !== 'undefined' ) {
+      this.mqttClient.end();
+    }
 
-    this.disconnect();
-    delete this.mqttClient;
+    if( ! tokenIsValid ) {
+      console.log( 'refreshing jwt' );
+      this.connectionArgs.password = this.authService.createJwt( this.projectId , this.privateKeyFile , this.algorithm );
+      this.connectionArgs.clean = true;
+    }
 
-    this.setupMqttClient();
+    return this.mqttClient = mqtt.connect( this.connectionArgs );
 
-  }
-
-  async disconnect(): Promise<void> {
-    await this.mqttClient.end();
-  }
-
-  getMqttClient( connectionArgs: MqttConnectionOptions ): MqttClient {
-    return mqtt.connect( connectionArgs );
   }
 
   onClose(): void {
@@ -120,7 +122,7 @@ export class MqttHandlerService {
   }
 
   onError( error: string ): void {
-    console.log( 'Connection error' , error );
+    console.log( 'MQTT connection error' , error );
   }
 
   onMessage( topic: string , message: string , packet: string ): void {
@@ -129,25 +131,24 @@ export class MqttHandlerService {
 
   sendData( payload: any ): void {
 
+    const mqttClient = this.getMqttClient();
     const jsonPayload = JSON.stringify( payload );
 
-    this.checkToken();
-
     console.log( this.mqttTopic , ': Publishing message' );
-    this.mqttClient.publish( this.mqttTopic , jsonPayload , { qos: 1 });
+    mqttClient.publish( this.mqttTopic , jsonPayload , { qos: 1 });
 
   }
 
   setupMqttClient(): void {
 
-    this.mqttClient = this.getMqttClient( this.connectionArgs );
+    const mqttClient = this.getMqttClient();
 
-    this.mqttClient.subscribe( '/devices/' + this.deviceId + '/config' );
+    mqttClient.subscribe( '/devices/' + this.deviceId + '/config' );
 
-    this.mqttClient.on( 'close' , this.onClose.bind( this ));
-    this.mqttClient.on( 'connect' , this.onConnect.bind( this ));
-    this.mqttClient.on( 'error' , this.onError.bind( this ));
-    this.mqttClient.on( 'message' , this.onMessage.bind( this ));
+    mqttClient.on( 'close' , this.onClose.bind( this ));
+    mqttClient.on( 'connect' , this.onConnect.bind( this ));
+    mqttClient.on( 'error' , this.onError.bind( this ));
+    mqttClient.on( 'message' , this.onMessage.bind( this ));
 
   }
 
