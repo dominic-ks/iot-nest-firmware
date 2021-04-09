@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 
+import { sign } from 'jsonwebtoken';
+import * as fs from 'fs';
+
 describe( 'AuthService' , () => {
   let service: AuthService;
 
@@ -8,6 +11,22 @@ describe( 'AuthService' , () => {
   const testToken = {
     some: 'data',
   }
+
+  const validToken = sign({
+    iat: Math.round(( Date.now() / 1000 ) + 0 * 60 ),
+    exp: Math.round(( Date.now() / 1000 ) + 20 * 60 ),
+    aud: 'my-audience',
+  }, fs.readFileSync( privateKeyFile ) , {
+    algorithm: 'RS256'
+  });
+
+  const expiredToken = sign({
+    iat: Math.round(( Date.now() / 1000 ) - 21 * 60 ),
+    exp: Math.round(( Date.now() / 1000 ) - 1 * 60 ),
+    aud: 'my-audience',
+  }, fs.readFileSync( privateKeyFile ) , {
+    algorithm: 'RS256'
+  });
 
   beforeEach( async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -33,6 +52,16 @@ describe( 'AuthService' , () => {
     expect( decoded ).toBeTruthy();
     expect( failedDecoded ).toBeFalsy();
 
+  });
+
+  it( 'should validate a token that has not expired' , () => {
+    let validatedToken = service.validateJwt( validToken , privateKeyFile , 'RS256' );
+    expect( validatedToken ).toBeTruthy();
+  });
+
+  it( 'should fail to validate an expired token' , () => {
+    let failedDecoded = service.validateJwt( expiredToken , privateKeyFile , 'RS256' );
+    expect( failedDecoded ).toBeFalsy();
   });
 
 });
