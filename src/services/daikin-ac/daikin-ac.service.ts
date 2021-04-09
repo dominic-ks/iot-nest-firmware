@@ -65,11 +65,15 @@ export class DaikinAcService implements VirtualDevice {
       },
       error => {
 
+        setTimeout(() => {
+          this.getSensorInfo();
+        }, 30000 );
+
         if( typeof( error.response ) !== 'undefined' && typeof( error.response.statusText ) !== 'undefined' ) {
-          return console.log( 'error' , error.response.statusText );
+          return console.log( 'Daikin AC polling error' , error.response.statusText );
         }
 
-        return console.log( 'error' , error );
+        return console.log( 'Daikin AC polling error' , error );
 
       }
     );
