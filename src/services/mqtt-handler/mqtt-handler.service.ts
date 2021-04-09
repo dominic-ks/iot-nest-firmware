@@ -84,7 +84,7 @@ export class MqttHandlerService {
 
     let tokenIsValid = false;
 
-    if( this.authService.validateJwt( this.connectionArgs.password , this.privateKeyFile , this.algorithm )) {
+    if( this.authService.validateJwt( this.connectionArgs.password )) {
       console.log( 'jwt is valid' );
       tokenIsValid = true;
     }
