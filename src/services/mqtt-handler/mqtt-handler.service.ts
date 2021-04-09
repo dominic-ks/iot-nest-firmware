@@ -89,7 +89,11 @@ export class MqttHandlerService {
       tokenIsValid = true;
     }
 
-    if( ! tokenIsValid && typeof( this.mqttClient ) !== 'undefined' ) {
+    if( tokenIsValid && typeof( this.mqttClient ) !== 'undefined' ) {
+      return this.mqttClient;
+    }
+
+    if( typeof( this.mqttClient ) !== 'undefined' ) {
       this.mqttClient.end();
     }
 
