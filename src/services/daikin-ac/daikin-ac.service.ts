@@ -106,7 +106,7 @@ export class DaikinAcService implements VirtualDevice {
     }
 
     if( ! dataChanged ) {
-      return;
+      //return;
     }
 
     this.sendData();
