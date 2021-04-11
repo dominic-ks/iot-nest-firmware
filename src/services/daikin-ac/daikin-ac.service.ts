@@ -70,7 +70,7 @@ export class DaikinAcService implements VirtualDevice {
         }, 30000 );
 
         if( typeof( error.response ) !== 'undefined' && typeof( error.response.statusText ) !== 'undefined' ) {
-          return console.log( 'Daikin AC polling error' , error.response.statusText );
+          return console.log( 'Daikin AC polling structured error' , error.response.statusText );
         }
 
         return console.log( 'Daikin AC polling error' , error );
