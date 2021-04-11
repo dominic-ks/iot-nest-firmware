@@ -33,7 +33,7 @@ export class MqttHandlerService {
   private projectId: string;
   private registryId: string;
 
-  private messageQueue: any[];
+  private messageQueue: any[] = [];
 
   constructor(
     private appMessagesService: AppMessagesService,
@@ -47,7 +47,7 @@ export class MqttHandlerService {
       filter( message => message.type === 'mqtt-send' )
     ).subscribe(
       resp => {
-        this.sendData( resp.data );
+        this.addToQueue( resp.data );
       }
     );
 
@@ -76,6 +76,10 @@ export class MqttHandlerService {
 
   }
 
+  addToQueue( payload: any ): void {
+    this.messageQueue.push( payload );
+  }
+
   disconnect(): void {
     this.mqttClient.end();
   }
@@ -85,7 +89,6 @@ export class MqttHandlerService {
     let tokenIsValid = false;
 
     if( this.authService.validateJwt( this.connectionArgs.password )) {
-      console.log( 'jwt is valid' );
       tokenIsValid = true;
     }
 
@@ -133,13 +136,30 @@ export class MqttHandlerService {
     console.log( topic , 'message received: ' , Buffer.from( message , 'base64' ).toString( 'ascii' ));
   }
 
-  sendData( payload: any ): void {
+  removeMessageFromQueue( key: number ) {
+
+  }
+
+  sendData(): void {
 
     const mqttClient = this.getMqttClient();
-    const jsonPayload = JSON.stringify( payload );
+    let queueSnapshot = [ ...this.messageQueue ];
 
-    console.log( this.mqttTopic , ': Publishing message' );
-    mqttClient.publish( this.mqttTopic , jsonPayload , { qos: 1 });
+    if( queueSnapshot.length !== 0 ) {
+
+      const queuedMessage = queueSnapshot[0];
+      const jsonPayload = JSON.stringify( queuedMessage );
+
+      console.log( this.mqttTopic , ': Publishing message' );
+      mqttClient.publish( this.mqttTopic , jsonPayload , { qos: 1 });
+
+      this.messageQueue.shift();
+
+    }
+
+    setTimeout(() => {
+      this.sendData();
+    }, 1000 );
 
   }
 
@@ -153,6 +173,8 @@ export class MqttHandlerService {
     mqttClient.on( 'connect' , this.onConnect.bind( this ));
     mqttClient.on( 'error' , this.onError.bind( this ));
     mqttClient.on( 'message' , this.onMessage.bind( this ));
+
+    this.sendData();
 
   }
 

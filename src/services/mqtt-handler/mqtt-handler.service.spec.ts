@@ -74,10 +74,10 @@ describe( 'MqttHandlerService' , () => {
 
     let getSpy = jest.spyOn( service , 'getMqttClient' );
 
-    await service.setupMqttClient();
-    expect( getSpy ).toHaveBeenCalledTimes( 1 );
+    service.setupMqttClient();
+    expect( getSpy ).toHaveBeenCalledTimes( 2 );
 
-    await service.disconnect();
+    service.disconnect();
 
   });
 
