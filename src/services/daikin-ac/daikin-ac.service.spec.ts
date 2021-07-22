@@ -4,6 +4,8 @@ import { DaikinAcService } from './daikin-ac.service';
 
 import { UtilityService } from '../utility/utility.service';
 
+console.log = jest.fn();
+
 describe( 'DaikinAcService' , () => {
   let service: DaikinAcService;
 
@@ -23,16 +25,23 @@ describe( 'DaikinAcService' , () => {
             broadcastMessage: () => true,
           },
           httpService: {
-            get: jest.fn()
-              .mockImplementationOnce(() => {
+            get: jest.fn(() => {
+               return new Observable( subscriber => {
+                  subscriber.next({
+                    data: 'key1=value1,key2=value2'
+                  });
+                  subscriber.complete();
+                })
+              }
+            ).mockImplementationOnce(() => {
                  return new Observable( subscriber => {
                     subscriber.next({
                       data: 'key1=value1,key2=value2'
                     });
                     subscriber.complete();
                   })
-                })
-              .mockImplementationOnce(() => {
+                }
+              ).mockImplementationOnce(() => {
                  return new Observable( subscriber => {
                    throw {
                      response: {
@@ -41,21 +50,22 @@ describe( 'DaikinAcService' , () => {
                    }
                    subscriber.complete();
                 })
-              })
-              .mockImplementationOnce(() => {
+              }
+            ).mockImplementationOnce(() => {
                  return new Observable( subscriber => {
                     subscriber.next({
                       data: 'key3=value3,key4=value4'
                     });
                     subscriber.complete();
                   })
-                })
-              .mockImplementationOnce(() => {
+                }
+              ).mockImplementationOnce(() => {
                  return new Observable( subscriber => {
                    throw 'Mock error';
                    subscriber.complete();
                 })
-              })
+              }
+            ),
           },
         }},
       ],
@@ -76,6 +86,7 @@ describe( 'DaikinAcService' , () => {
 
     let getSpy = jest.spyOn( service , 'getSensorInfo' );
 
+    jest.useFakeTimers();
     service.setDevice( testDevice );
 
     expect( service.deviceInfo ).toBeDefined();
