@@ -74,6 +74,10 @@ export class MqttHandlerService {
       secureProtocol: 'TLSv1_2_method'
     };
 
+    setInterval(() => {
+      this.sendData();
+    }, 1500 )
+
   }
 
   addToQueue( payload: any ): void {
@@ -147,19 +151,16 @@ export class MqttHandlerService {
 
     if( queueSnapshot.length !== 0 ) {
 
+      const now = new Date().toISOString();
       const queuedMessage = queueSnapshot[0];
       const jsonPayload = JSON.stringify( queuedMessage );
 
-      console.log( this.mqttTopic , ': Publishing message' );
+      console.log( now + ': ' + this.mqttTopic , ': Publishing message' );
       mqttClient.publish( this.mqttTopic , jsonPayload , { qos: 1 });
 
       this.messageQueue.shift();
 
     }
-
-    setTimeout(() => {
-      this.sendData();
-    }, 1000 );
 
   }
 
@@ -173,8 +174,6 @@ export class MqttHandlerService {
     mqttClient.on( 'connect' , this.onConnect.bind( this ));
     mqttClient.on( 'error' , this.onError.bind( this ));
     mqttClient.on( 'message' , this.onMessage.bind( this ));
-
-    this.sendData();
 
   }
 

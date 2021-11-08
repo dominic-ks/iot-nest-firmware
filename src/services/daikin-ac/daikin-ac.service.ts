@@ -58,16 +58,8 @@ export class DaikinAcService implements VirtualDevice {
 
         this.setDeviceData( responseData );
 
-        setTimeout(() => {
-          this.getSensorInfo();
-        }, 30000 );
-
       },
       error => {
-
-        setTimeout(() => {
-          this.getSensorInfo();
-        }, 30000 );
 
         if( typeof( error.response ) !== 'undefined' && typeof( error.response.statusText ) !== 'undefined' ) {
           return console.log( 'Daikin AC polling structured error' , error.response.statusText );
@@ -81,8 +73,13 @@ export class DaikinAcService implements VirtualDevice {
   }
 
   setDevice( device: DaikinAcDevice ): void {
+
     this.deviceInfo = device;
-    this.getSensorInfo();
+    
+    setTimeout(() => {
+      this.getSensorInfo();
+    }, 5000 );
+
   }
 
   setDeviceData( data: any ) {
@@ -106,7 +103,7 @@ export class DaikinAcService implements VirtualDevice {
     }
 
     if( ! dataChanged ) {
-      //return;
+      return;
     }
 
     this.sendData();
