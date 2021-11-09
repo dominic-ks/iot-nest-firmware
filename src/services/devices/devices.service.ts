@@ -31,7 +31,7 @@ export class DevicesService {
     }
 
     let matchedDevice = matchedDevices[0];
-    matchedDevice.setDeviceData( device.data );
+    matchedDevice.updateDeviceData( device );
 
     this.devices.next( this.devicesStore );
 

@@ -11,6 +11,7 @@ import { Device } from '../../classes/device/device';
 class DaikinAcDevice extends Device {
   address: string;
   id: string;
+  parent: string;
   type: string;
 }
 
@@ -74,14 +75,18 @@ export class DaikinAcService implements VirtualDevice {
 
   setDevice( device: DaikinAcDevice ): void {
 
-    this.deviceInfo = device;
+    this.updateDeviceData( device );
     
-    setTimeout(() => {
+    setInterval(() => {
       this.getSensorInfo();
     }, 5000 );
 
   }
 
+  // @deprecated - ? - not sure why we need to do this
+  // initially this was called when new device config was received
+  // however, there doesn't seem to be a need to broadcast data that was just received...
+  // perhaps we'll use something like this to execute commands...
   setDeviceData( data: any ) {
 
     let dataChanged = false;
@@ -115,6 +120,10 @@ export class DaikinAcService implements VirtualDevice {
       data: this.deviceInfo,
       type: 'mqtt-send',
     });
+  }
+
+  updateDeviceData( device: DaikinAcDevice ): void {
+    this.deviceInfo = device;
   }
 
 }

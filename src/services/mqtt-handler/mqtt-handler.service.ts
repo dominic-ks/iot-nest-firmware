@@ -14,8 +14,6 @@ import { DevicesService } from '../devices/devices.service';
 import { AppMessage } from '../../classes/app-message/app-message';
 import { MqttConnectionOptions } from '../../classes/mqtt-connection-options/mqtt-connection-options';
 
-const deviceList = require( '../../../devices.json' );
-
 @Injectable()
 export class MqttHandlerService {
 
@@ -120,13 +118,7 @@ export class MqttHandlerService {
 
   onConnect( success: boolean ) {
     if( success ) {
-
       console.log( 'Client connected...' );
-
-      for( let device of deviceList ) {
-        this.devicesService.addDevicesToStore( device );
-      }
-
     } else {
       console.log( 'Client not connected...' );
     }
@@ -137,7 +129,17 @@ export class MqttHandlerService {
   }
 
   onMessage( topic: string , message: string , packet: string ): void {
-    console.log( topic , 'message received: ' , Buffer.from( message , 'base64' ).toString( 'ascii' ));
+
+    const config = Buffer.from( message , 'base64' ).toString( 'ascii' );
+
+    if( topic === `/devices/${ this.deviceId }/config` ) {
+      for( let device of JSON.parse( config )) {
+        this.devicesService.addDevicesToStore( device );
+      }
+    }
+
+    console.log( topic , 'message received: ' , config );
+
   }
 
   removeMessageFromQueue( key: number ) {
