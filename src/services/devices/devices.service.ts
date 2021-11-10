@@ -7,6 +7,7 @@ import { DaikinAcService } from '../daikin-ac/daikin-ac.service';
 import { UtilityService } from '../utility/utility.service';
 
 import { Device } from '../../classes/device/device';
+import { DeviceCommand } from '../../classes/device-command/device-command';
 import { DeviceInterfaceClassDefinition } from '../../classes/device-interface-class-definition/device-interface-class-definition';
 
 @Injectable()
@@ -37,6 +38,19 @@ export class DevicesService {
 
   }
 
+  executeCommand( command: DeviceCommand ): void {
+
+    try {
+      const virtualDevice = this.getDeviceFromStore( command.deviceId );
+      virtualDevice.executeDeviceCommand( command.data );
+    }
+
+    catch( e ) {
+      console.log( 'Failed to execute device command:' , e.message );
+    }
+
+  }
+
   getDeviceInterface( device: Device ): VirtualDevice {
 
     const deviceInterfaceClassDefinitions = this.getDeviceInterfaceClassDefinitions();
@@ -58,6 +72,18 @@ export class DevicesService {
     return [
       { type: 'daikin-ac-unit' , class: DaikinAcService },
     ]
+  }
+
+  getDeviceFromStore( deviceId: string ): VirtualDevice {
+    
+    const virtualDevice = this.getDeviceStore().find( device => device.deviceInfo.id === deviceId );
+
+    if( ! virtualDevice ) {
+      throw 'Invalid device requested.';
+    }
+
+    return virtualDevice;
+
   }
 
   getDeviceStore(): VirtualDevice[] {

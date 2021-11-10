@@ -7,6 +7,7 @@ import { AppMessagesService } from '../app-messages/app-messages.service';
 import { UtilityService } from '../utility/utility.service';
 
 import { Device } from '../../classes/device/device';
+import { request } from 'express';
 
 class DaikinAcDevice extends Device {
   address: string;
@@ -15,8 +16,9 @@ class DaikinAcDevice extends Device {
   type: string;
 }
 
-class DaikinAcDeviceSensorInfo {
-
+class DaikinAcCommandData {
+  slug: string;
+  value: any;
 }
 
 @Injectable()
@@ -31,6 +33,28 @@ export class DaikinAcService implements VirtualDevice {
   ) {
     this.appMessagesService = this.utilityService.appMessagesService;
     this.httpService = this.utilityService.httpService;
+  }
+
+  executeDeviceCommand( data: DaikinAcCommandData[] ): void {
+
+    let sendData = []
+
+    for( let datapair of data ) {
+      sendData.push( datapair.slug + '=' + datapair.value );
+    }
+
+    const requestUrl = this.deviceInfo.address + '/aircon/set_control_info?' + sendData.join( '&' );
+    console.log( requestUrl );
+
+    this.httpService.post( requestUrl ).subscribe(
+      resp => {
+        console.log( 'Command successfully executed for device ' , this.deviceInfo.id );
+      },
+      error => {
+        console.log( error.response.status , ': ' , error.response.statusText );
+      }
+    );
+
   }
 
   getDeviceTypeName() {
@@ -83,10 +107,6 @@ export class DaikinAcService implements VirtualDevice {
 
   }
 
-  // @deprecated - ? - not sure why we need to do this
-  // initially this was called when new device config was received
-  // however, there doesn't seem to be a need to broadcast data that was just received...
-  // perhaps we'll use something like this to execute commands...
   setDeviceData( data: any ) {
 
     let dataChanged = false;

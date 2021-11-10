@@ -130,15 +130,17 @@ export class MqttHandlerService {
 
   onMessage( topic: string , message: string , packet: string ): void {
 
-    const config = Buffer.from( message , 'base64' ).toString( 'ascii' );
+    const decodedMessage = Buffer.from( message , 'base64' ).toString( 'ascii' );
 
     if( topic === `/devices/${ this.deviceId }/config` ) {
-      for( let device of JSON.parse( config )) {
+      for( let device of JSON.parse( decodedMessage )) {
         this.devicesService.addDevicesToStore( device );
       }
     }
 
-    console.log( topic , 'message received: ' , config );
+    if( topic === `/devices/${ this.deviceId }/commands` ) {
+      this.devicesService.executeCommand( JSON.parse( decodedMessage ));
+    }
 
   }
 
@@ -170,7 +172,8 @@ export class MqttHandlerService {
 
     const mqttClient = this.getMqttClient();
 
-    mqttClient.subscribe( '/devices/' + this.deviceId + '/config' );
+    mqttClient.subscribe( '/devices/' + this.deviceId + '/config' , { qos: 1 });
+    mqttClient.subscribe( '/devices/' + this.deviceId + '/commands/#' , { qos: 0 });
 
     mqttClient.on( 'close' , this.onClose.bind( this ));
     mqttClient.on( 'connect' , this.onConnect.bind( this ));
