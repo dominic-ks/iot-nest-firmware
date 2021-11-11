@@ -49,6 +49,7 @@ export class DaikinAcService implements VirtualDevice {
     this.httpService.post( requestUrl ).subscribe(
       resp => {
         console.log( 'Command successfully executed for device ' , this.deviceInfo.id );
+        this.getSensorInfo();
       },
       error => {
         console.log( error.response.status , ': ' , error.response.statusText );
