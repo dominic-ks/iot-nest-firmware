@@ -108,7 +108,17 @@ export class MqttHandlerService {
       this.connectionArgs.clean = true;
     }
 
-    return this.mqttClient = mqtt.connect( this.connectionArgs );
+    this.mqttClient = mqtt.connect( this.connectionArgs );
+
+    this.mqttClient.subscribe( '/devices/' + this.deviceId + '/config' , { qos: 1 });
+    this.mqttClient.subscribe( '/devices/' + this.deviceId + '/commands/#' , { qos: 0 });
+
+    this.mqttClient.on( 'close' , this.onClose.bind( this ));
+    this.mqttClient.on( 'connect' , this.onConnect.bind( this ));
+    this.mqttClient.on( 'error' , this.onError.bind( this ));
+    this.mqttClient.on( 'message' , this.onMessage.bind( this ));
+
+    return this.mqttClient;
 
   }
 
@@ -169,17 +179,7 @@ export class MqttHandlerService {
   }
 
   setupMqttClient(): void {
-
     const mqttClient = this.getMqttClient();
-
-    mqttClient.subscribe( '/devices/' + this.deviceId + '/config' , { qos: 1 });
-    mqttClient.subscribe( '/devices/' + this.deviceId + '/commands/#' , { qos: 0 });
-
-    mqttClient.on( 'close' , this.onClose.bind( this ));
-    mqttClient.on( 'connect' , this.onConnect.bind( this ));
-    mqttClient.on( 'error' , this.onError.bind( this ));
-    mqttClient.on( 'message' , this.onMessage.bind( this ));
-
   }
 
 }
