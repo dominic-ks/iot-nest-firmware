@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -e
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+touch ./current-version.txt
+
+git fetch --tags
+
+LATEST=$(git describe --tags $(git rev-list --tags --max-count=1))
+CURRENT=$(cat ./current-version.txt)
+
+echo "CURRENT:" $CURRENT
+echo "LATEST:" $LATEST
+
+if [[ $LATEST != $CURRENT ]]
+then 
+	
+	echo "Downloading latest..."
+	git -c advice.detachedHead=false checkout tags/$LATEST
+	
+	echo "Installing dependencies..."
+	npm install --only=prod
+	
+	echo "Building project..."
+	npm run build:prod
+	
+	echo "Restarting PM2..."
+	
+	if ! pm2 start ../dist/main.js && pm2 startup && pm2 save
+	then 
+		pm2 restart main	
+	fi
+	
+	echo $LATEST > ./current-version.txt
+	
+	echo "All done"
+	
+else
+	echo "Nothing to do..."
+fi
