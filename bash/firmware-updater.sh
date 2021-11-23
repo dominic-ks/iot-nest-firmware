@@ -27,7 +27,7 @@ then
 	
 	echo "Restarting PM2..."
 	
-	if ! pm2 start ../dist/main.js && pm2 startup && pm2 save
+	if ! pm2 start ../dist/main.js
 	then 
 		pm2 restart main	
 	fi
