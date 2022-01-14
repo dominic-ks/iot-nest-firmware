@@ -1,4 +1,5 @@
 import { Injectable, HttpService } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { AppMessagesService } from '../app-messages/app-messages.service';
 
@@ -7,6 +8,7 @@ export class UtilityService {
 
   constructor(
     public appMessagesService: AppMessagesService,
+    public configService: ConfigService,
     public httpService: HttpService,
   ) { }
 

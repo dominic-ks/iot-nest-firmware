@@ -30,6 +30,7 @@
     "install": "^0.13.0",
     "jsonwebtoken": "^8.5.1",
     "mqtt": "^4.2.6",
+    "node-dht-sensor": "^0.4.3",
     "npm": "^7.8.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",

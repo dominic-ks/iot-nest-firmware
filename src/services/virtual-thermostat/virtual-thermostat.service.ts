@@ -1,9 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { AppMessagesService } from '../app-messages/app-messages.service';
+import { UtilityService } from '../utility/utility.service';
+
 import { Device } from '../../classes/device/device';
+
 import { VirtualDevice } from '../../interfaces/virtual-device.interface';
 
+var sensor = require( 'node-dht-sensor' );
 class VirtualThermostatDevice extends Device {
   data: {
     pin?: number;
@@ -18,7 +23,15 @@ class VirtualThermostatDevice extends Device {
 export class VirtualThermostatService implements VirtualDevice {
 
   private appMessagesService: AppMessagesService;
+  private configService: ConfigService;
   public deviceInfo: VirtualThermostatDevice;
+
+  constructor(
+    private utilityService: UtilityService,
+  ) {
+    this.appMessagesService = this.utilityService.appMessagesService;
+    this.configService = this.utilityService.configService;
+  }
 
   executeDeviceCommand( commandData: any ): void { }
 
@@ -27,7 +40,27 @@ export class VirtualThermostatService implements VirtualDevice {
   }
 
   getSensorInfo(): void {
-    // get the readings and call setDeviceData...
+    
+    if( this.configService.get<string>( 'NODE_ENV' ) === 'development' ) {
+      sensor.initialize({
+        test: {
+          fake: {
+            temperature: 21,
+            humidity: 60
+          }
+        }
+      });
+    }
+
+    sensor.read( this.deviceInfo.data.type , this.deviceInfo.data.pin , function( err , temperature , humidity ) {
+      if( ! err ) {
+        return this.setDeviceData({
+          htemp: temperature.toFixed( 1 ),
+          hhum: humidity.toFixed( 1 ),
+        });
+      }
+    }.bind( this ));
+
   }
 
   setDevice( device: VirtualThermostatDevice ): void {
