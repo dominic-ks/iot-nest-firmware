@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { VirtualDevice } from '../../interfaces/virtual-device.interface';
 
 import { DaikinAcService } from '../daikin-ac/daikin-ac.service';
+import { VirtualThermostatService } from '../virtual-thermostat/virtual-thermostat.service';
 import { UtilityService } from '../utility/utility.service';
 
 import { Device } from '../../classes/device/device';
@@ -71,6 +72,7 @@ export class DevicesService {
   getDeviceInterfaceClassDefinitions(): DeviceInterfaceClassDefinition[] {
     return [
       { type: 'daikin-ac-unit' , class: DaikinAcService },
+      { type: 'virtual-thermostat' , class: VirtualThermostatService },
     ]
   }
 

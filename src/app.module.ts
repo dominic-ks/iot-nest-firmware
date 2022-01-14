@@ -9,6 +9,7 @@ import { DevicesService } from './services/devices/devices.service';
 import { DaikinAcService } from './services/daikin-ac/daikin-ac.service';
 import { AppMessagesService } from './services/app-messages/app-messages.service';
 import { UtilityService } from './services/utility/utility.service';
+import { VirtualThermostatService } from './services/virtual-thermostat/virtual-thermostat.service';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { UtilityService } from './services/utility/utility.service';
     DevicesService,
     DaikinAcService,
     AppMessagesService,
-    UtilityService
+    UtilityService,
+    VirtualThermostatService
   ],
 })
 export class AppModule {}
