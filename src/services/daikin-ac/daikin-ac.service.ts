@@ -104,7 +104,7 @@ export class DaikinAcService implements VirtualDevice {
     
     setInterval(() => {
       this.getSensorInfo();
-    }, 5000 );
+    }, this.deviceInfo.interval );
 
   }
 
