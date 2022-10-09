@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { BehaviorSubject } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import { VirtualDevice } from '../../interfaces/virtual-device.interface';
 
 import { DaikinAcService } from '../daikin-ac/daikin-ac.service';
+import { HiveThermostatService } from '../hive-thermostat/hive-thermostat.service';
 import { VirtualThermostatService } from '../virtual-thermostat/virtual-thermostat.service';
 import { UtilityService } from '../utility/utility.service';
+import { Zigbee2mqttService } from '../zigbee2mqtt/zigbee2mqtt.service';
+
+import { AppMessagesService } from '../app-messages/app-messages.service';
 
 import { Device } from '../../classes/device/device';
 import { DeviceCommand } from '../../classes/device-command/device-command';
@@ -14,6 +19,7 @@ import { DeviceInterfaceClassDefinition } from '../../classes/device-interface-c
 @Injectable()
 export class DevicesService {
 
+  private appMessagesService: AppMessagesService
   private devices = new BehaviorSubject( null );
   private devicesStore: VirtualDevice[] = [];
 
@@ -21,21 +27,38 @@ export class DevicesService {
 
   constructor(
     private readonly utilityService: UtilityService,
-  ) { }
+  ) {
+
+    this.appMessagesService = this.utilityService.appMessagesService;
+
+    this.appMessagesService.currentMessage.pipe(
+      filter( message => message ),
+      filter( message => message.type === 'device-add' ),
+    ).subscribe(
+      resp => this.addDevicesToStore( resp.data ),
+    );
+
+  }
 
   addDevicesToStore( device: Device ): void {
 
-    let matchedDevices = this.devicesStore.filter( virtualDevice => virtualDevice.deviceInfo.id === device.id );
+    try {
+      let matchedDevices = this.devicesStore.filter( virtualDevice => virtualDevice.deviceInfo.id === device.id );
 
-    if( matchedDevices.length === 0 ) {
-      this.devicesStore.push( this.getDeviceInterface( device ));
-      return;
+      if( matchedDevices.length === 0 ) {
+        this.devicesStore.push( this.getDeviceInterface( device ));
+        return;
+      }
+
+      let matchedDevice = matchedDevices[0];
+      matchedDevice.updateDeviceData( device );
+
+      this.devices.next( this.devicesStore );
     }
 
-    let matchedDevice = matchedDevices[0];
-    matchedDevice.updateDeviceData( device );
-
-    this.devices.next( this.devicesStore );
+    catch( e ) {
+      console.error( e );
+    }
 
   }
 
@@ -58,7 +81,7 @@ export class DevicesService {
     const deviceInterfaceClassDefinition = deviceInterfaceClassDefinitions.filter( definition => definition.type === device.type );
 
     if( deviceInterfaceClassDefinition.length === 0 ) {
-      throw 'Unable to find a registered interface for device with ID ' + device.id + ' of type ' + device.type;
+      throw 'Unable to find a registered interface for device with ID ' + device.id + ' of type ' + device.type
     }
 
     const deviceClass = deviceInterfaceClassDefinition[0].class;
@@ -72,7 +95,9 @@ export class DevicesService {
   getDeviceInterfaceClassDefinitions(): DeviceInterfaceClassDefinition[] {
     return [
       { type: 'daikin-ac-unit' , class: DaikinAcService },
+      { type: 'SLR1b' , class: HiveThermostatService },
       { type: 'virtual-thermostat' , class: VirtualThermostatService },
+      { type: 'zigbee2mqtt' , class: Zigbee2mqttService },
     ]
   }
 

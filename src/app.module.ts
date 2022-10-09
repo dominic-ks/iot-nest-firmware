@@ -10,6 +10,8 @@ import { DaikinAcService } from './services/daikin-ac/daikin-ac.service';
 import { AppMessagesService } from './services/app-messages/app-messages.service';
 import { UtilityService } from './services/utility/utility.service';
 import { VirtualThermostatService } from './services/virtual-thermostat/virtual-thermostat.service';
+import { HiveThermostatService } from './services/hive-thermostat/hive-thermostat.service';
+import { Zigbee2mqttService } from './services/zigbee2mqtt/zigbee2mqtt.service';
 
 @Module({
   imports: [
@@ -27,7 +29,9 @@ import { VirtualThermostatService } from './services/virtual-thermostat/virtual-
     DaikinAcService,
     AppMessagesService,
     UtilityService,
-    VirtualThermostatService
+    VirtualThermostatService,
+    HiveThermostatService,
+    Zigbee2mqttService
   ],
 })
 export class AppModule {}

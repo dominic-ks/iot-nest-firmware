@@ -16,4 +16,8 @@ export class UtilityService {
     return this[ property ];
   }
 
+  set( property: string , value: any ): void {
+    this[ property ] = value;
+  }
+
 }
