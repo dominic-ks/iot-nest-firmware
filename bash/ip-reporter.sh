@@ -1,8 +1,5 @@
-#!/bin/bash
+#!/bin/sh
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
-
-export $(egrep -v '^#' .env | xargs)
 myip="$(wget -qO- http://ipecho.net/plain | xargs echo)"
 DATE_ISO=$(date +"%Y-%m-%dT%H:%M:%S")
 
