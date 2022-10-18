@@ -160,7 +160,7 @@ export class Zigbee2mqttService implements VirtualDevice {
 
     this.mqttClient = mqtt.connect({
       clientId: 'local-zigbee',
-      host: 'localhost',
+      host: 'mqtt',
       port: 1883,
     });
 
