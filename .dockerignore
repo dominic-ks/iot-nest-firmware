@@ -1,0 +1,23 @@
+# dev
+.git
+.github
+.gitignore
+.prettierrc
+nest-cli.json
+package.json
+src
+test
+ts-config.build.json
+ts-config.json
+
+# docker
+.dockerignore
+.eslintrc.js
+docker
+Dockerfile
+docker-compose-dev.yml
+docker-compose.yml
+
+# general
+README.md
+bash
