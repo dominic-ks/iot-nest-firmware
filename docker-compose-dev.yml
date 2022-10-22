@@ -11,8 +11,17 @@ services:
 
   scripts:
     image: curlimages/curl:7.85.0
-    profiles: ["scripts"]
+    profiles:
+      - scripts
     volumes: 
       - ./bash:/scripts
     working_dir: /scripts
     env_file: ./docker/volumes/node/config/.env
+
+  gcp:
+    image: google/cloud-sdk:latest
+    profiles:
+      - scripts
+
+volumes:
+  gcp:

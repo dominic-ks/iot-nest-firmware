@@ -38,6 +38,7 @@ services:
 
   scripts:
     image: bdvs/iot-scripts:0.0.1
-    profiles: ["scripts"]
+    profiles: 
+      - scripts
     env_file: /device-data/node/config/.env
     entrypoint: /bin/sh
