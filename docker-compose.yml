@@ -1,10 +1,7 @@
 version: '3.8'
 services:
   app:
-    depends_on:
-      - mqtt
-      - zigbee2mqtt
-    image: bdvs/iot-nest-firmware:0.0.1
+    image: bdvs/iot-nest-firmware:0.0.5
     volumes:
       - /device-data/node/config:/config
     working_dir: /app/dist
@@ -13,6 +10,8 @@ services:
 
   mqtt:
     image: eclipse-mosquitto:2.0
+    profiles: 
+      - mqtt
     restart: unless-stopped
     volumes:
       - "/device-data/mosquitto/mosquitto-data:/mosquitto"
@@ -26,6 +25,8 @@ services:
       - mqtt
     restart: unless-stopped
     image: koenkk/zigbee2mqtt:1.28.0
+    profiles: 
+      - mqtt
     volumes:
       - /device-data/zigbee2mqtt/zigbee2mqtt-data:/app/data
       - /run/udev:/run/udev:ro
