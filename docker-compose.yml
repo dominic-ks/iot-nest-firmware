@@ -1,12 +1,14 @@
 version: '3.8'
 services:
   app:
-    image: bdvs/iot-nest-firmware:0.0.5
+    image: europe-west2-docker.pkg.dev/iot-projects-309015/iot-nest-firmware/bdvs/iot-nest-firmware:0.0.5
+    profiles: 
+      - app
     volumes:
-      - /device-data/node/config:/config
+      - ~/.config/device/:/config
     working_dir: /app/dist
     command: node /app/dist/main
-    env_file: /device-data/node/config/.env
+    env_file: ~/.config/device/.env
 
   mqtt:
     image: eclipse-mosquitto:2.0
@@ -41,5 +43,5 @@ services:
     image: bdvs/iot-scripts:0.0.1
     profiles: 
       - scripts
-    env_file: /device-data/node/config/.env
+    env_file: ~/.config/device/.env
     entrypoint: /bin/sh

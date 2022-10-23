@@ -2,12 +2,14 @@ version: '3.8'
 services:
   app:
     image: node:14-alpine
+    profiles: 
+      - app
     volumes:
-      - ./docker/volumes/node/config:/config
+      - ~/.config/device/:/config
       - ./:/app
     working_dir: /app
     command: npm run start:dev
-    env_file: ./docker/volumes/node/config/.env
+    env_file: ~/.config/device/.env
 
   scripts:
     image: curlimages/curl:7.85.0
@@ -16,7 +18,7 @@ services:
     volumes: 
       - ./bash:/scripts
     working_dir: /scripts
-    env_file: ./docker/volumes/node/config/.env
+    env_file: ~/.config/device/.env
 
   gcp:
     image: google/cloud-sdk:latest
