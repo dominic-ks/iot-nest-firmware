@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   app:
-    image: europe-west2-docker.pkg.dev/iot-projects-309015/iot-nest-firmware/bdvs/iot-nest-firmware:0.0.5
+    image: europe-west2-docker.pkg.dev/iot-projects-309015/iot-nest-firmware/bdvs/iot-nest-firmware:0.0.6
     profiles: 
       - app
     volumes:
