@@ -4,6 +4,7 @@ services:
     image: europe-west2-docker.pkg.dev/iot-projects-309015/iot-nest-firmware/bdvs/iot-nest-firmware:latest
     profiles: 
       - app
+    restart: unless-stopped
     volumes:
       - ~/.config/device/:/config
     working_dir: /app/dist
