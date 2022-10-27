@@ -17,7 +17,7 @@ services:
       - mqtt
     restart: unless-stopped
     volumes:
-      - "/device-data/mosquitto/mosquitto-data:/mosquitto"
+      - "~/.config/mosquitto/mosquitto-data:/mosquitto"
     ports:
       - "1883:1883"
       - "9001:9001"
@@ -31,7 +31,7 @@ services:
     profiles: 
       - mqtt
     volumes:
-      - /device-data/zigbee2mqtt/zigbee2mqtt-data:/app/data
+      - ~/.config/zigbee2mqtt/zigbee2mqtt-data:/zigbee2mqtt
       - /run/udev:/run/udev:ro
     ports:
       - 8081:8080
@@ -39,10 +39,3 @@ services:
       - TZ=Europe/London
     devices:
       - /dev/ttyACM0:/dev/ttyACM0
-
-  scripts:
-    image: bdvs/iot-scripts:0.0.1
-    profiles: 
-      - scripts
-    env_file: ~/.config/device/.env
-    entrypoint: /bin/sh
