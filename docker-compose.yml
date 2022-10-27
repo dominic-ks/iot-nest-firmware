@@ -31,7 +31,7 @@ services:
     profiles: 
       - mqtt
     volumes:
-      - ~/.config/zigbee2mqtt/zigbee2mqtt-data:/zigbee2mqtt
+      - ~/.config/zigbee2mqtt/zigbee2mqtt-data:/app/data
       - /run/udev:/run/udev:ro
     ports:
       - 8081:8080
