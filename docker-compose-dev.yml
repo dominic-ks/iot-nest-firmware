@@ -11,6 +11,35 @@ services:
     command: npm run start:dev
     env_file: ~/.config/device/.env
 
+  mqtt:
+    image: eclipse-mosquitto:2.0
+    profiles: 
+      - mqtt
+    restart: always
+    volumes:
+      - "~/.config/mosquitto/mosquitto-data:/mosquitto"
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    command: "mosquitto -c /mosquitto-no-auth.conf"
+
+  zigbee2mqtt:
+    depends_on:
+      - mqtt
+    restart: always
+    image: koenkk/zigbee2mqtt:1.28.0
+    profiles: 
+      - mqtt
+    volumes:
+      - ~/.config/zigbee2mqtt/zigbee2mqtt-data:/app/data
+      - /run/udev:/run/udev:ro
+    ports:
+      - 8081:8080
+    environment:
+      - TZ=Europe/London
+    devices:
+      - /dev/ttyACM0:/dev/ttyACM0
+
   scripts:
     image: curlimages/curl:7.85.0
     profiles:
