@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 import { VirtualDevice } from '../../interfaces/virtual-device.interface';
 
 import { DaikinAcService } from '../daikin-ac/daikin-ac.service';
+import { HiveBulbService } from '../hive-bulb/hive-bulb.service';
 import { HiveThermostatService } from '../hive-thermostat/hive-thermostat.service';
 import { VirtualThermostatService } from '../virtual-thermostat/virtual-thermostat.service';
 import { UtilityService } from '../utility/utility.service';
@@ -95,6 +96,7 @@ export class DevicesService {
   getDeviceInterfaceClassDefinitions(): DeviceInterfaceClassDefinition[] {
     return [
       { type: 'daikin-ac-unit' , class: DaikinAcService },
+      { type: 'FWBulb02UK' , class: HiveBulbService },
       { type: 'SLR1b' , class: HiveThermostatService },
       { type: 'virtual-thermostat' , class: VirtualThermostatService },
       { type: 'zigbee2mqtt' , class: Zigbee2mqttService },
