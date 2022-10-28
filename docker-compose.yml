@@ -4,7 +4,7 @@ services:
     image: europe-west2-docker.pkg.dev/iot-projects-309015/iot-nest-firmware/bdvs/iot-nest-firmware:latest
     profiles: 
       - app
-    restart: unless-stopped
+    restart: always
     volumes:
       - ~/.config/device/:/config
     working_dir: /app/dist
@@ -15,7 +15,7 @@ services:
     image: eclipse-mosquitto:2.0
     profiles: 
       - mqtt
-    restart: unless-stopped
+    restart: always
     volumes:
       - "~/.config/mosquitto/mosquitto-data:/mosquitto"
     ports:
@@ -26,7 +26,7 @@ services:
   zigbee2mqtt:
     depends_on:
       - mqtt
-    restart: unless-stopped
+    restart: always
     image: koenkk/zigbee2mqtt:1.28.0
     profiles: 
       - mqtt
