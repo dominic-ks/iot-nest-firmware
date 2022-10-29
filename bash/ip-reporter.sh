@@ -8,7 +8,7 @@ myip="$(wget -qO- http://ipecho.net/plain | xargs echo)"
 DATE_ISO=$(date +"%Y-%m-%dT%H:%M:%S")
 
 DEVICEID=${DEVICEID//[^[:alnum:]&&[:punct:]]/}
-CURLURL="https://$CLOUDREGION-$PROJECTID.cloudfunctions.net/api/device/$DEVICEID/report-ip/"
+CURLURL="https://$FUNCTIONSREGION-$PROJECTID.cloudfunctions.net/api/device/$DEVICEID/report-ip/"
 
 curl --location --request POST "$CURLURL" \
         --header 'Content-Type: application/json' \
