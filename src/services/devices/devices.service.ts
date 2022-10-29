@@ -71,7 +71,7 @@ export class DevicesService {
     }
 
     catch( e ) {
-      console.log( 'Failed to execute device command:' , e.message );
+      console.log( 'Failed to execute device command:' , command );
     }
 
   }
