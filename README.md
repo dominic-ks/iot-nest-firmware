@@ -1,3 +1,21 @@
+# IOT NEST FIRMWARE
+
+## To do
+ - Organise this file
+
+## A note on various configs required on the host
+ - https://github.com/GoogleCloudPlatform/docker-credential-gcr - is required to setup auth with no gcloud sdk and add entries to ~/.docker/config.json using $ docker-credential-gcr configure-docker --registries="europe-west2-docker.pkg.dev"
+ - https://github.com/containrrr/watchtower/issues/119#issuecomment-593833358 - explains how to use this with the Watchtower image
+ - ~/.config/device/ needs to contain the .env and the IOT Core certificate
+ - ~/.config/zigbee2mqtt/zigbee2mqtt-data/ needs to contain configuration.yaml to configure the mqtt
+ - ~/.config/gcloud/application_default_credentials.json needs to contain the gcloud private key
+ - The ./bash folder contains other scripts that come in handy
+ - docker and docker-compose, obviously...
+
+<!-------------------------------->
+<!-------------------------------->
+<!-------------------------------->
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
 </p>

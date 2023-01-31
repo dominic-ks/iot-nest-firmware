@@ -17,20 +17,7 @@ if [[ $LATEST != $CURRENT ]]
 then 
 	
 	echo "Downloading latest..."
-	git -c advice.detachedHead=false checkout tags/$LATEST
-	
-	echo "Installing dependencies..."
-	npm install --only=prod
-	
-	echo "Building project..."
-	npm run build:prod
-	
-	echo "Restarting PM2..."
-	
-	if ! pm2 start ../dist/main.js
-	then 
-		pm2 restart main	
-	fi
+	git -c advice.detachedHead=false checkout tags/$latest
 	
 	echo $LATEST > ./current-version.txt
 	
