@@ -9,7 +9,9 @@ services:
       - ./:/app
     working_dir: /app
     command: npm run start:dev
-    env_file: ~/.config/device/.env
+    env_file: ./.env
+    networks:
+      - mqtt-broker_bdvs-iot
 
   mqtt:
     image: eclipse-mosquitto:2.0
@@ -22,6 +24,8 @@ services:
       - "1883:1883"
       - "9001:9001"
     command: "mosquitto -c /mosquitto-no-auth.conf"
+    networks:
+      - mqtt-broker_bdvs-iot
 
   zigbee2mqtt:
     depends_on:
@@ -39,6 +43,8 @@ services:
       - TZ=Europe/London
     devices:
       - /dev/ttyACM0:/dev/ttyACM0
+    networks:
+      - mqtt-broker_bdvs-iot
 
   scripts:
     image: curlimages/curl:7.85.0
@@ -56,3 +62,7 @@ services:
 
 volumes:
   gcp:
+
+networks:
+  mqtt-broker_bdvs-iot:
+    external: true

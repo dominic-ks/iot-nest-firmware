@@ -27,9 +27,11 @@ export class MqttHandlerService {
   private mqttHost: string;
   private mqttPort: number;
   private mqttTopic: string;
+  private password: string;
   private privateKeyFile: string;
   private projectId: string;
   private registryId: string;
+  private username: string;
 
   private messageQueue: any[] = [];
 
@@ -55,21 +57,23 @@ export class MqttHandlerService {
     this.messageType = this.configService.get<string>( 'MESSAGETYPE' );
     this.mqttHost = this.configService.get<string>( 'MQTTHOST' );
     this.mqttPort = this.configService.get<number>( 'MQTTPORT' );
+    this.password = this.configService.get<string>( 'PASSWORD' );
     this.privateKeyFile = this.configService.get<string>( 'PRIVATEKEYFILE' );
     this.projectId = this.configService.get<string>( 'PROJECTID' );
     this.registryId = this.configService.get<string>( 'REGISTRYID' );
+    this.username = this.configService.get<string>( 'USERNAME' );
 
     this.mqttClientId = 'projects/' + this.projectId + '/locations/' + this.cloudRegion + '/registries/' + this.registryId + '/devices/' + this.deviceId;
-    this.mqttTopic = '/devices/' + this.deviceId + '/' + this.messageType;
+    this.mqttTopic = 'devices/' + this.deviceId + '/' + this.messageType;
 
     this.connectionArgs = {
       host: this.mqttHost,
       port: this.mqttPort,
       clientId: this.mqttClientId,
-      username: 'unused',
-      password: this.authService.createJwt( this.projectId , this.privateKeyFile , this.algorithm ),
-      protocol: 'mqtts',
-      secureProtocol: 'TLSv1_2_method'
+      username: this.username,
+      password: this.password,
+      // protocol: 'mqtts',
+      // secureProtocol: 'TLSv1_2_method'
     };
 
     setInterval(() => {
@@ -88,11 +92,12 @@ export class MqttHandlerService {
 
   getMqttClient(): MqttClient {
 
-    let tokenIsValid = false;
+    // let tokenIsValid = false;
+    let tokenIsValid = true;
 
-    if( this.authService.validateJwt( this.connectionArgs.password )) {
-      tokenIsValid = true;
-    }
+    // if( this.authService.validateJwt( this.connectionArgs.password )) {
+    //   tokenIsValid = true;
+    // }
 
     if( tokenIsValid && typeof( this.mqttClient ) !== 'undefined' ) {
       return this.mqttClient;
@@ -110,8 +115,8 @@ export class MqttHandlerService {
 
     this.mqttClient = mqtt.connect( this.connectionArgs );
 
-    this.mqttClient.subscribe( '/devices/' + this.deviceId + '/config' , { qos: 1 });
-    this.mqttClient.subscribe( '/devices/' + this.deviceId + '/commands/#' , { qos: 0 });
+    this.mqttClient.subscribe( 'devices/' + this.deviceId + '/config' , { qos: 1 });
+    this.mqttClient.subscribe( 'devices/' + this.deviceId + '/commands/#' , { qos: 0 });
 
     this.mqttClient.on( 'close' , this.onClose.bind( this ));
     this.mqttClient.on( 'connect' , this.onConnect.bind( this ));
@@ -142,13 +147,13 @@ export class MqttHandlerService {
 
     const decodedMessage = Buffer.from( message , 'base64' ).toString( 'ascii' );
 
-    if( topic === `/devices/${ this.deviceId }/config` ) {
+    if( topic === `devices/${ this.deviceId }/config` ) {
       for( let device of JSON.parse( decodedMessage )) {
         this.devicesService.addDevicesToStore( device );
       }
     }
 
-    if( topic === `/devices/${ this.deviceId }/commands` ) {
+    if( topic === `devices/${ this.deviceId }/commands` ) {
       this.devicesService.executeCommand( JSON.parse( decodedMessage ));
     }
 

@@ -4,7 +4,7 @@ export class MqttConnectionOptions {
   host: string;
   password: string;
   port: number;
-  protocol: string;
-  secureProtocol: string;
+  protocol?: string;
+  secureProtocol?: string;
   username: string;
 }
