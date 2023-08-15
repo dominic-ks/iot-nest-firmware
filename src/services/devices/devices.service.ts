@@ -43,6 +43,8 @@ export class DevicesService {
 
   addDevicesToStore( device: Device ): void {
 
+    console.log( device );
+
     try {
       let matchedDevices = this.devicesStore.filter( virtualDevice => virtualDevice.deviceInfo.id === device.id );
 
