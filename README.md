@@ -4,6 +4,7 @@
  - Organise this file
 
 ## A note on various configs required on the host
+ - NB! neither gcloud cli nor docker-credential-gcr work on 32bit arm (raspberry pi zero for example)
  - https://github.com/GoogleCloudPlatform/docker-credential-gcr - is required to setup auth with no gcloud sdk and add entries to ~/.docker/config.json using $ docker-credential-gcr configure-docker --registries="europe-west2-docker.pkg.dev"
  - https://github.com/containrrr/watchtower/issues/119#issuecomment-593833358 - explains how to use this with the Watchtower image
  - ~/.config/device/ needs to contain the .env and the IOT Core certificate
@@ -11,6 +12,10 @@
  - ~/.config/gcloud/application_default_credentials.json needs to contain the gcloud private key
  - The ./bash folder contains other scripts that come in handy
  - docker and docker-compose, obviously...
+ - the registry has been made public with this: gcloud artifacts repositories add-iam-policy-binding iot-nest-firmware --location=europe-west2 --member=allUsers --role=artifactregistry.repositories.downloadArtifacts
+ - the registry can be made private like this: gcloud artifacts repositories remove-iam-policy-binding iot-nest-firmware --location=europe-west2 --member=allUsers --role=artifactregistry.repositories.downloadArtifacts
+
+
 
 <!-------------------------------->
 <!-------------------------------->

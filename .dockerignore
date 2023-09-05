@@ -3,6 +3,7 @@
 .github
 .gitignore
 .prettierrc
+bash
 nest-cli.json
 node_modules
 src
@@ -21,3 +22,6 @@ docker-compose.yml
 # general
 README.md
 bash
+
+# env
+.env
