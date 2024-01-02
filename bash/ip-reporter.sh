@@ -4,7 +4,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 export $(egrep -v '^#' ~/.config/device/.env | xargs)
 
-myip="$(wget -qO- http://ipecho.net/plain | xargs echo)"
+myip="$(wget -qO- -4 http://icanhazip.com | xargs echo)"
 DATE_ISO=$(date +"%Y-%m-%dT%H:%M:%S")
 
 DEVICEID=${DEVICEID//[^[:alnum:]&&[:punct:]]/}
