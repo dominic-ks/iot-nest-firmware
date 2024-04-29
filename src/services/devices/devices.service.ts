@@ -7,6 +7,7 @@ import { VirtualDevice } from '../../interfaces/virtual-device.interface';
 import { DaikinAcService } from '../daikin-ac/daikin-ac.service';
 import { HiveBulbService } from '../hive-bulb/hive-bulb.service';
 import { HiveThermostatService } from '../hive-thermostat/hive-thermostat.service';
+import { Pms5003Service } from '../pms5003/pms5003.service'; 
 import { VirtualThermostatService } from '../virtual-thermostat/virtual-thermostat.service';
 import { UtilityService } from '../utility/utility.service';
 import { Zigbee2mqttService } from '../zigbee2mqtt/zigbee2mqtt.service';
@@ -99,6 +100,7 @@ export class DevicesService {
     return [
       { type: 'daikin-ac-unit' , class: DaikinAcService },
       { type: 'FWBulb02UK' , class: HiveBulbService },
+      { type: 'pms5003' , class: Pms5003Service },
       { type: 'SLR1b' , class: HiveThermostatService },
       { type: 'virtual-thermostat' , class: VirtualThermostatService },
       { type: 'zigbee2mqtt' , class: Zigbee2mqttService },

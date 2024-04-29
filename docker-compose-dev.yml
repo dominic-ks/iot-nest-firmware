@@ -13,6 +13,15 @@ services:
     networks:
       - mqtt-broker_bdvs-iot
 
+  python_watch:
+    image: node:lts-alpine3.19
+    profiles: 
+      - app
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: npm run watch:python
+
   mqtt:
     image: eclipse-mosquitto:2.0
     profiles: 

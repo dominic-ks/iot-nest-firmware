@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "copy:python": "cp -r src/python/*.py dist/python",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "build:prod": "rimraf dist && tsc -p tsconfig.build.json",
@@ -20,7 +21,17 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage --watch",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "watch:python": "npm-watch copy:python"
+  },
+  "watch": {
+    "copy:python": {
+      "patterns": [
+        "src/python"
+      ],
+      "extensions": "py",
+      "ignore": "dist"
+    }
   },
   "dependencies": {
     "@nestjs/common": "^7.5.1",
@@ -52,6 +63,7 @@
     "eslint-config-prettier": "7.2.0",
     "eslint-plugin-prettier": "^3.1.4",
     "jest": "^26.6.3",
+    "npm-watch": "^0.11.0",
     "prettier": "^2.1.2",
     "supertest": "^6.0.0",
     "ts-jest": "^26.4.3",

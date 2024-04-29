@@ -15,7 +15,6 @@ services:
     image: eclipse-mosquitto:2.0
     profiles: 
       - mqtt
-    restart: always
     volumes:
       - "~/.config/mosquitto/mosquitto-data:/mosquitto"
     ports:
