@@ -10,6 +10,8 @@ services:
     working_dir: /app
     command: npm run start:dev
     env_file: ./.env
+    devices:
+      - /dev/ttyACM0:/dev/ttyACM0
     networks:
       - mqtt-broker_bdvs-iot
 
@@ -25,8 +27,8 @@ services:
   mqtt:
     image: eclipse-mosquitto:2.0
     profiles: 
+      - app
       - mqtt
-    restart: always
     volumes:
       - "~/.config/mosquitto/mosquitto-data:/mosquitto"
     ports:
