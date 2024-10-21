@@ -14,6 +14,8 @@ import { HiveThermostatService } from './services/hive-thermostat/hive-thermosta
 import { Zigbee2mqttService } from './services/zigbee2mqtt/zigbee2mqtt.service';
 import { HiveBulbService } from './services/hive-bulb/hive-bulb.service';
 import { Pms5003Service } from './services/pms5003/pms5003.service';
+import { SerialConnectorService } from './services/serial-connector/serial-connector.service';
+import { Pms5003SerialService } from './services/pms5003-serial/pms5003-serial.service';
 
 @Module({
   imports: [
@@ -35,7 +37,9 @@ import { Pms5003Service } from './services/pms5003/pms5003.service';
     HiveThermostatService,
     Zigbee2mqttService,
     HiveBulbService,
-    Pms5003Service
+    Pms5003Service,
+    SerialConnectorService,
+    Pms5003SerialService
   ],
 })
 export class AppModule {}
