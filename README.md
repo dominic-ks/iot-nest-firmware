@@ -2,6 +2,13 @@
 
 ## To do
  - Organise this file
+ 
+## Forward USB to WSL
+ - https://learn.microsoft.com/en-us/windows/wsl/connect-usb
+ - List USB devices in Windows: uspipd list
+ - Run `sudo modprobe vhci_hcd` in WSL
+ - Bind USB device to WSL: `usbipd wsl bind --busid <busid>`
+ - Forward USB device to WSL: `usbipd wsl attach --busid <busid>`
 
 ## A note on various configs required on the host
  - NB! neither gcloud cli nor docker-credential-gcr work on 32bit arm (raspberry pi zero for example)
@@ -11,7 +18,7 @@
  - ~/.config/zigbee2mqtt/zigbee2mqtt-data/ needs to contain configuration.yaml to configure the mqtt
  - ~/.config/gcloud/application_default_credentials.json needs to contain the gcloud private key
  - The ./bash folder contains other scripts that come in handy
- - docker and docker-compose, obviously...
+ - docker and docker compose, obviously...
  - the registry has been made public with this: gcloud artifacts repositories add-iam-policy-binding iot-nest-firmware --location=europe-west2 --member=allUsers --role=artifactregistry.repositories.downloadArtifacts
  - the registry can be made private like this: gcloud artifacts repositories remove-iam-policy-binding iot-nest-firmware --location=europe-west2 --member=allUsers --role=artifactregistry.repositories.downloadArtifacts
 
