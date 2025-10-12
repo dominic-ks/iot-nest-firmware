@@ -25,6 +25,8 @@ export class VirtualThermostatService implements VirtualDevice {
   private appMessagesService: AppMessagesService;
   private configService: ConfigService;
   public deviceInfo: VirtualThermostatDevice;
+  private currentTemperature: number = 19.5; // Initial value in middle of range
+  private currentHumidity: number = 70; // Initial value in middle of range
 
   constructor(
     private utilityService: UtilityService,
@@ -39,14 +41,28 @@ export class VirtualThermostatService implements VirtualDevice {
     return 'Virtual Thermostat';
   }
 
+  private generateRandomValue(currentValue: number, min: number, max: number): number {
+    // Calculate ±5% range
+    const fivePercent = currentValue * 0.05;
+    const changeMin = Math.max(min, currentValue - fivePercent);
+    const changeMax = Math.min(max, currentValue + fivePercent);
+    
+    // Generate random value within the constrained range
+    return Math.random() * (changeMax - changeMin) + changeMin;
+  }
+
   getSensorInfo(): void {
     
     if( this.configService.get<string>( 'NODE_ENV' ) === 'development' ) {
+      // Generate new random values with ±5% change constraint
+      this.currentTemperature = this.generateRandomValue(this.currentTemperature, 18, 21);
+      this.currentHumidity = this.generateRandomValue(this.currentHumidity, 60, 80);
+      
       sensor.initialize({
         test: {
           fake: {
-            temperature: 21,
-            humidity: 60
+            temperature: this.currentTemperature,
+            humidity: this.currentHumidity
           }
         }
       });
