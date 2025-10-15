@@ -12,6 +12,7 @@ import { Pms5003SerialService } from '../pms5003-serial/pms5003-serial.service';
 import { VirtualThermostatService } from '../virtual-thermostat/virtual-thermostat.service';
 import { UtilityService } from '../utility/utility.service';
 import { Zigbee2mqttService } from '../zigbee2mqtt/zigbee2mqtt.service';
+import { DummyDeviceService } from '../dummy-device/dummy-device.service';
 
 import { AppMessagesService } from '../app-messages/app-messages.service';
 
@@ -100,6 +101,7 @@ export class DevicesService {
   getDeviceInterfaceClassDefinitions(): DeviceInterfaceClassDefinition[] {
     return [
       { type: 'daikin-ac-unit' , class: DaikinAcService },
+      { type: 'dummy-device' , class: DummyDeviceService },
       { type: 'FWBulb02UK' , class: HiveBulbService },
       { type: 'pms5003' , class: Pms5003Service },
       { type: 'pms5003-serial' , class: Pms5003SerialService },

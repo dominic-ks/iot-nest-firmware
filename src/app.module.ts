@@ -16,6 +16,7 @@ import { HiveBulbService } from './services/hive-bulb/hive-bulb.service';
 import { Pms5003Service } from './services/pms5003/pms5003.service';
 import { SerialConnectorService } from './services/serial-connector/serial-connector.service';
 import { Pms5003SerialService } from './services/pms5003-serial/pms5003-serial.service';
+import { DummyDeviceService } from './services/dummy-device/dummy-device.service';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { Pms5003SerialService } from './services/pms5003-serial/pms5003-serial.s
     HiveBulbService,
     Pms5003Service,
     SerialConnectorService,
-    Pms5003SerialService
+    Pms5003SerialService,
+    DummyDeviceService
   ],
 })
 export class AppModule {}
