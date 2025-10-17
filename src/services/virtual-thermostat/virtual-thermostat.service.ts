@@ -74,6 +74,8 @@ export class VirtualThermostatService implements VirtualDevice {
           htemp: temperature.toFixed( 1 ),
           hhum: humidity.toFixed( 1 ),
         });
+      } else {
+        console.error( 'DHT Sensor read error: ' + err );
       }
     }.bind( this ));
 
