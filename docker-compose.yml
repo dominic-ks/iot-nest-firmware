@@ -5,6 +5,9 @@ services:
     profiles: 
       - app
     restart: always
+    privileged: true
+    devices:
+      - /dev/gpiomem:/dev/gpiomem
     volumes:
       - ~/.config/device/:/config
     working_dir: /app/dist
