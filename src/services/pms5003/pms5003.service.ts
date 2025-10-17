@@ -43,6 +43,7 @@ export class Pms5003Service implements VirtualDevice {
 
   private appMessagesService: AppMessagesService;
   public deviceInfo: PMS5003Device;
+  private intervalId: NodeJS.Timeout | null = null;
 
   constructor(
     private utilityService: UtilityService,
@@ -82,7 +83,12 @@ export class Pms5003Service implements VirtualDevice {
 
     this.updateDeviceData( device );
     
-    setInterval(() => {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+    
+    this.getSensorInfo();
+    this.intervalId = setInterval(() => {
       this.getSensorInfo();
     }, this.deviceInfo.interval );
 

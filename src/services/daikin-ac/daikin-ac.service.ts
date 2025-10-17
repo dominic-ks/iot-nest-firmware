@@ -27,6 +27,7 @@ export class DaikinAcService implements VirtualDevice {
   private appMessagesService: AppMessagesService;
   private httpService: HttpService;
   public deviceInfo: DaikinAcDevice;
+  private intervalId: NodeJS.Timeout | null = null;
 
   constructor(
     private utilityService: UtilityService,
@@ -101,8 +102,13 @@ export class DaikinAcService implements VirtualDevice {
   setDevice( device: DaikinAcDevice ): void {
 
     this.updateDeviceData( device );
+
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
     
-    setInterval(() => {
+    this.getSensorInfo();
+    this.intervalId = setInterval(() => {
       this.getSensorInfo();
     }, this.deviceInfo.interval );
 

@@ -33,6 +33,7 @@ export class Pms5003SerialService implements OnModuleDestroy, VirtualDevice {
   private subscriptions: Subscription = new Subscription();
 
   public deviceInfo: Device;
+  private intervalId: NodeJS.Timeout | null = null;
 
   constructor(
     private utilityService: UtilityService,
@@ -84,7 +85,12 @@ export class Pms5003SerialService implements OnModuleDestroy, VirtualDevice {
 
     this.updateDeviceData( device );
     
-    setInterval(() => {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+    
+    this.getSensorInfo();
+    this.intervalId = setInterval(() => {
       this.getSensorInfo();
     }, this.deviceInfo.interval );
 

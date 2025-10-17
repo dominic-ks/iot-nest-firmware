@@ -27,6 +27,7 @@ export class VirtualThermostatService implements VirtualDevice {
   public deviceInfo: VirtualThermostatDevice;
   private currentTemperature: number = 19.5; // Initial value in middle of range
   private currentHumidity: number = 70; // Initial value in middle of range
+  private intervalId: NodeJS.Timeout | null = null;
 
   constructor(
     private utilityService: UtilityService,
@@ -84,9 +85,13 @@ export class VirtualThermostatService implements VirtualDevice {
   setDevice( device: VirtualThermostatDevice ): void {
 
     this.updateDeviceData( device );
+
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
     
     this.getSensorInfo();
-    setInterval(() => {
+    this.intervalId = setInterval(() => {
       this.getSensorInfo();
     }, this.deviceInfo.interval );
 
