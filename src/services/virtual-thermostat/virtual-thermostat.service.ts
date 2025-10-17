@@ -85,6 +85,7 @@ export class VirtualThermostatService implements VirtualDevice {
 
     this.updateDeviceData( device );
     
+    this.getSensorInfo();
     setInterval(() => {
       this.getSensorInfo();
     }, this.deviceInfo.interval );
