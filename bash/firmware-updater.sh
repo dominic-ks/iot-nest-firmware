@@ -17,7 +17,7 @@ if [[ $LATEST != $CURRENT ]]
 then 
 	
 	echo "Downloading latest..."
-	git -c advice.detachedHead=false checkout tags/$latest
+	git -c advice.detachedHead=false checkout tags/$LATEST
 	
 	echo $LATEST > ./current-version.txt
 	
