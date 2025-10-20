@@ -28,9 +28,6 @@ export class VirtualThermostatService implements VirtualDevice {
   private currentTemperature: number = 19.5; // Initial value in middle of range
   private currentHumidity: number = 70; // Initial value in middle of range
   private intervalId: NodeJS.Timeout | null = null;
-  private postingIntervalId: NodeJS.Timeout | null = null;
-  private readings: { temperature: number, humidity: number, timestamp: Date }[] = [];
-  private lastPostTime: Date = new Date();
 
   constructor(
     private utilityService: UtilityService,
@@ -74,38 +71,15 @@ export class VirtualThermostatService implements VirtualDevice {
 
     sensor.read( this.deviceInfo.data.type , this.deviceInfo.data.pin , function( err , temperature , humidity ) {
       if( ! err ) {
-        this.readings.push({
-          temperature: temperature,
-          humidity: humidity,
-          timestamp: new Date()
+        return this.setDeviceData({
+          htemp: temperature.toFixed( 1 ),
+          hhum: humidity.toFixed( 1 ),
         });
       } else {
         console.error( 'DHT Sensor read error: ' + err );
       }
     }.bind( this ));
 
-  }
-
-  private postAverage(): void {
-    if (this.readings.length === 0) return;
-
-    // Filter readings since lastPostTime
-    const recentReadings = this.readings.filter(r => r.timestamp > this.lastPostTime);
-
-    if (recentReadings.length === 0) return;
-
-    const avgTemp = recentReadings.reduce((sum, r) => sum + r.temperature, 0) / recentReadings.length;
-    const avgHum = recentReadings.reduce((sum, r) => sum + r.humidity, 0) / recentReadings.length;
-
-    this.setDeviceData({
-      htemp: avgTemp.toFixed(1),
-      hhum: avgHum.toFixed(1),
-    });
-
-    this.lastPostTime = new Date();
-
-    // Clear old readings to prevent memory buildup
-    this.readings = this.readings.filter(r => r.timestamp > this.lastPostTime);
   }
 
   setDevice( device: VirtualThermostatDevice ): void {
@@ -115,18 +89,11 @@ export class VirtualThermostatService implements VirtualDevice {
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }
-    if (this.postingIntervalId) {
-      clearInterval(this.postingIntervalId);
-    }
     
     this.getSensorInfo();
     this.intervalId = setInterval(() => {
       this.getSensorInfo();
-    }, 10000); // Poll every 10 seconds
-
-    this.postingIntervalId = setInterval(() => {
-      this.postAverage();
-    }, this.deviceInfo.interval); // Post average on device interval
+    }, this.deviceInfo.interval );
 
   }
 
