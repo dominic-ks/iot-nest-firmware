@@ -139,17 +139,27 @@ export class Zigbee2mqttService implements VirtualDevice {
 
   onMessage( topic: string , message: string ): void {
 
-    const decodedMessage = JSON.parse( Buffer.from( message , 'base64' ).toString( 'ascii' ));
 
-    if( topic === 'zigbee2mqtt/bridge/devices' ) {
+    try {
+      const decodedMessage = JSON.parse( Buffer.from( message , 'base64' ).toString( 'utf8' ));
 
-      this.attachedDevices = decodedMessage;
-      this.deviceInfo.data.devices = this.convertConnectedDevices( decodedMessage );
+      if( topic === 'zigbee2mqtt/bridge/devices' ) {
 
-      // this.getDeviceTraits( decodedMessage );      
-      this.updateMqtt();      
-      this.addConnectedDevices();
+        this.attachedDevices = decodedMessage;
+        this.deviceInfo.data.devices = this.convertConnectedDevices( decodedMessage );
 
+        // this.getDeviceTraits( decodedMessage );      
+        this.updateMqtt();      
+        this.addConnectedDevices();
+
+      }
+
+    } catch (error) {
+      console.error('Failed to decode MQTT message:', {
+        topic,
+        messageLength: message.length,
+        error: error.message
+      });
     }
 
   }
@@ -160,8 +170,8 @@ export class Zigbee2mqttService implements VirtualDevice {
 
     this.mqttClient = mqtt.connect({
       clientId: 'local-zigbee',
-      host: 'mqtt',
-      port: 1883,
+      host: 'localhost',
+      port: 1884,
     });
 
     this.mqttClient.subscribe( 'zigbee2mqtt/bridge/devices' , { qos: 0 });
