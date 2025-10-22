@@ -9,6 +9,7 @@ import { HiveBulbService } from '../hive-bulb/hive-bulb.service';
 import { HiveThermostatService } from '../hive-thermostat/hive-thermostat.service';
 import { Pms5003Service } from '../pms5003/pms5003.service'; 
 import { Pms5003SerialService } from '../pms5003-serial/pms5003-serial.service';
+import { SonoffTempHumiditySensorService } from '../sonoff-temp-humidity-sensor/sonoff-temp-humidity-sensor.service';
 import { VirtualThermostatService } from '../virtual-thermostat/virtual-thermostat.service';
 import { UtilityService } from '../utility/utility.service';
 import { Zigbee2mqttService } from '../zigbee2mqtt/zigbee2mqtt.service';
@@ -106,6 +107,7 @@ export class DevicesService {
       { type: 'pms5003' , class: Pms5003Service },
       { type: 'pms5003-serial' , class: Pms5003SerialService },
       { type: 'SLR1b' , class: HiveThermostatService },
+      { type: 'SNZB-02D' , class: SonoffTempHumiditySensorService },
       { type: 'virtual-thermostat' , class: VirtualThermostatService },
       { type: 'zigbee2mqtt' , class: Zigbee2mqttService },
     ]
