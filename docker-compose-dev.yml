@@ -7,10 +7,12 @@ services:
       - ~/.config/device/:/config
       - ./:/app
     working_dir: /app
-    command: npm run start:dev
+    command: sh -c "apk add --no-cache python3 && npm run start:dev"
     env_file: ./.env
-    devices:
-      - /dev/ttyACM0:/dev/ttyACM0
+    environment:
+      - NODE_ENV=development
+    # devices:
+    #   - /dev/ttyACM0:/dev/ttyACM0
     network_mode: host
 
   python_watch:
@@ -29,7 +31,7 @@ services:
     volumes:
       - "~/.config/mosquitto/mosquitto-data:/mosquitto"
     ports:
-      - "1883:1883"
+      - "1884:1883"
       - "9001:9001"
     command: "mosquitto -c /mosquitto-no-auth.conf"
     networks:
@@ -39,7 +41,7 @@ services:
     depends_on:
       - mqtt
     restart: always
-    image: koenkk/zigbee2mqtt:1.28.0
+    image: koenkk/zigbee2mqtt:2.6.2
     profiles: 
       - mqtt
     volumes:

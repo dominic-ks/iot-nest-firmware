@@ -1,0 +1,22 @@
+[
+  {
+    "address": "N/A",
+    "data": {
+      "pin": "GPIO4"
+    },
+    "id": "DHT22-001",
+    "interval": 60000,
+    "parent": "dev-device-001",
+    "type": "dht22"
+  },
+  {
+    "address": "N/A", 
+    "data": {
+      "pin": "GPIO17"
+    },
+    "id": "DHT22-002",
+    "interval": 120000,
+    "parent": "dev-device-002",
+    "type": "dht22"
+  }
+]

@@ -3,3 +3,4 @@ gpiodevice==0.0.4
 pms5003==1.0.0
 pyserial==3.5
 python-dotenv==1.0.1
+adafruit-circuitpython-dht

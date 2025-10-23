@@ -10,8 +10,9 @@ services:
       - /dev/gpiomem:/dev/gpiomem
     volumes:
       - ~/.config/device/:/config
-    working_dir: /app/dist
-    command: node /app/dist/main
+      - ./:/app
+    working_dir: /app
+    command: node dist/main
     env_file: ~/.config/device/.env
 
   mqtt:
