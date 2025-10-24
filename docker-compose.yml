@@ -10,9 +10,9 @@ services:
       - /dev/gpiomem:/dev/gpiomem
     volumes:
       - ~/.config/device/:/config
-      - ./:/app
+      - ./python-venv:/app/python-venv
     working_dir: /app
-    command: node dist/main
+    command: node /app/dist/main
     env_file: ~/.config/device/.env
 
   mqtt:
