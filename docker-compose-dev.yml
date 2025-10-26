@@ -9,8 +9,8 @@ services:
     working_dir: /app
     command: npm run start:dev
     env_file: ./.env
-    devices:
-      - /dev/ttyACM0:/dev/ttyACM0
+    # devices:
+    #   - /dev/ttyACM0:/dev/ttyACM0
     network_mode: host
 
   python_watch:
