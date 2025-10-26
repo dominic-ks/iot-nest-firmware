@@ -17,7 +17,8 @@ if not is_development:
 sensor = Adafruit_DHT.DHT22 if not is_development else None
 pin = 4  # GPIO4
 
-output_file = 'dht22_readings.json'
+script_dir = os.path.dirname(os.path.abspath(__file__))
+output_file = os.path.join(script_dir, "dht22_readings.json")
 
 while True:
     if is_development:
