@@ -14,6 +14,7 @@ import { VirtualThermostatService } from '../virtual-thermostat/virtual-thermost
 import { UtilityService } from '../utility/utility.service';
 import { Zigbee2mqttService } from '../zigbee2mqtt/zigbee2mqtt.service';
 import { DummyDeviceService } from '../dummy-device/dummy-device.service';
+import { Dht22DeviceService } from '../dht22-device/dht22-device.service';
 
 import { AppMessagesService } from '../app-messages/app-messages.service';
 
@@ -102,6 +103,7 @@ export class DevicesService {
   getDeviceInterfaceClassDefinitions(): DeviceInterfaceClassDefinition[] {
     return [
       { type: 'daikin-ac-unit' , class: DaikinAcService },
+      { type: 'dht22' , class: Dht22DeviceService },
       { type: 'dummy-device' , class: DummyDeviceService },
       { type: 'FWBulb02UK' , class: HiveBulbService },
       { type: 'pms5003' , class: Pms5003Service },

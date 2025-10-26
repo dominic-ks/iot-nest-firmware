@@ -40,5 +40,8 @@ devices.json
 bash/current-version.txt
 bash/.env
 
+# sensor readings
+dht22_readings.json
+
 # docker
 docker
