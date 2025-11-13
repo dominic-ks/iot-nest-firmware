@@ -5,10 +5,10 @@
  
 ## Forward USB to WSL
  - https://learn.microsoft.com/en-us/windows/wsl/connect-usb
- - List USB devices in Windows: uspipd list
- - Run `sudo modprobe vhci_hcd` in WSL
- - Bind USB device to WSL: `usbipd wsl bind --busid <busid>`
- - Forward USB device to WSL: `usbipd wsl attach --busid <busid>`
+ - Run `sudo modprobe vhci_hcd` in WSL first
+ - List USB devices in Windows: `usbipd list`
+ - Bind USB device: `usbipd bind --busid <busid>`
+ - Attach USB device to WSL: `usbipd attach --wsl --busid <busid>`
 
 ## A note on various configs required on the host
  - NB! neither gcloud cli nor docker-credential-gcr work on 32bit arm (raspberry pi zero for example)
