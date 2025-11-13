@@ -19,6 +19,8 @@ import { Pms5003SerialService } from './services/pms5003-serial/pms5003-serial.s
 import { DummyDeviceService } from './services/dummy-device/dummy-device.service';
 import { SonoffTempHumiditySensorService } from './services/sonoff-temp-humidity-sensor/sonoff-temp-humidity-sensor.service';
 import { Dht22DeviceService } from './services/dht22-device/dht22-device.service';
+import { Mics6814SerialService } from './services/mics6814-serial/mics6814-serial.service';
+import { Mq135SerialService } from './services/mq135-serial/mq135-serial.service';
 
 @Module({
   imports: [
@@ -45,7 +47,9 @@ import { Dht22DeviceService } from './services/dht22-device/dht22-device.service
     Pms5003SerialService,
     DummyDeviceService,
     SonoffTempHumiditySensorService,
-    Dht22DeviceService
+    Dht22DeviceService,
+    Mics6814SerialService,
+    Mq135SerialService
   ],
 })
 export class AppModule {}

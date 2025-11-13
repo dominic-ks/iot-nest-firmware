@@ -9,6 +9,8 @@ import { HiveBulbService } from '../hive-bulb/hive-bulb.service';
 import { HiveThermostatService } from '../hive-thermostat/hive-thermostat.service';
 import { Pms5003Service } from '../pms5003/pms5003.service'; 
 import { Pms5003SerialService } from '../pms5003-serial/pms5003-serial.service';
+import { Mics6814SerialService } from '../mics6814-serial/mics6814-serial.service';
+import { Mq135SerialService } from '../mq135-serial/mq135-serial.service';
 import { SonoffTempHumiditySensorService } from '../sonoff-temp-humidity-sensor/sonoff-temp-humidity-sensor.service';
 import { VirtualThermostatService } from '../virtual-thermostat/virtual-thermostat.service';
 import { UtilityService } from '../utility/utility.service';
@@ -106,6 +108,8 @@ export class DevicesService {
       { type: 'dht22' , class: Dht22DeviceService },
       { type: 'dummy-device' , class: DummyDeviceService },
       { type: 'FWBulb02UK' , class: HiveBulbService },
+      { type: 'mics6814-serial' , class: Mics6814SerialService },
+      { type: 'mq135-serial' , class: Mq135SerialService },
       { type: 'pms5003' , class: Pms5003Service },
       { type: 'pms5003-serial' , class: Pms5003SerialService },
       { type: 'SLR1b' , class: HiveThermostatService },
