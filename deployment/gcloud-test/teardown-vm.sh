@@ -4,7 +4,7 @@
 set -e
 
 # Load environment variables
-source .env
+source .env.gcloud-test
 
 # Check if gcloud is installed
 if ! command -v gcloud &> /dev/null; then

@@ -4,7 +4,7 @@
 set -e
 
 # Load environment variables
-source .env
+source .env.gcloud-test
 
 # Check if gcloud is authenticated
 if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" | grep -q .; then
@@ -15,6 +15,10 @@ fi
 # Copy os-provisioning
 echo "Copying os-provisioning to VM..."
 gcloud compute scp --recurse --zone=$ZONE ../os-provisioning iot-rpi-dev-box:~/ --compress
+
+echo "Copying scripts to VM..."
+gcloud compute scp --zone=$ZONE apply.sh iot-rpi-dev-box:~/os-provisioning/scripts/
+gcloud compute scp --zone=$ZONE bootstrap-nix.sh iot-rpi-dev-box:~/os-provisioning/scripts/
 
 # Create directories on VM
 echo "Creating directories on VM..."

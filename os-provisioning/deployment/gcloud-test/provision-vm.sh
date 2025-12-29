@@ -4,7 +4,7 @@
 set -e
 
 # Load environment variables
-source .env
+source "$(dirname "$0")/.env.gcloud-test"
 
 # Check if gcloud is installed and authenticated
 if ! command -v gcloud &> /dev/null; then
@@ -40,11 +40,11 @@ echo "VM $VM_NAME is ready at $EXTERNAL_IP"
 
 # Copy project files to VM
 echo "Copying os-provisioning and app files to VM..."
-./scripts/copy-to-vm.sh
+"$(dirname "$0")/copy-to-vm.sh"
 
 # Run provisioning on VM
 # echo "Running provisioning on VM..."
-gcloud compute ssh $VM_NAME --zone=$ZONE --command "cd ~/os-provisioning && ./scripts/bootstrap-nix.sh && ./scripts/apply.sh"
+gcloud compute ssh $VM_NAME --zone=$ZONE --command 'cd ~/os-provisioning && ./deployment/gcloud-test/bootstrap-nix.sh && ./deployment/gcloud-test/apply.sh'
 
 echo "Provisioning complete."
 echo "To connect via SSH: gcloud compute ssh $VM_NAME --zone=$ZONE"
