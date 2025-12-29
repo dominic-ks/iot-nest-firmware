@@ -39,6 +39,7 @@ lerna-debug.log*
 devices.json
 bash/current-version.txt
 bash/.env
+**/.env.*
 
 # sensor readings
 dht22_readings.json
