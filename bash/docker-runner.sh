@@ -11,7 +11,7 @@ do
     COMMAND="$COMMAND --profile $ELEMENT"
 done
 
-COMMAND="$COMMAND up"
+COMMAND="$COMMAND up -d"
 
 echo $COMMAND
 eval "$COMMAND"

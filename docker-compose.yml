@@ -1,18 +1,4 @@
-version: '3.8'
 services:
-  app:
-    image: europe-west2-docker.pkg.dev/iot-projects-309015/iot-nest-firmware/bdvs/iot-nest-firmware:latest
-    profiles: 
-      - app
-    restart: always
-    privileged: true
-    devices:
-      - /dev/gpiomem:/dev/gpiomem
-    volumes:
-      - ~/.config/device/:/config
-    working_dir: /app/dist
-    command: node /app/dist/main
-    env_file: ~/.config/device/.env
 
   mqtt:
     image: eclipse-mosquitto:2.0
@@ -41,11 +27,3 @@ services:
       - TZ=Europe/London
     devices:
       - /dev/ttyACM0:/dev/ttyACM0
-
-  watchtower:
-    image: containrrr/watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    profiles: 
-      - app
-    restart: always

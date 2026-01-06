@@ -47,4 +47,26 @@ else
     echo "Warning: ../dist not found. Build the app first with 'npm run build'."
 fi
 
+# Copy docker-compose.yml
+if [ -f "$(cd "$(dirname "$0")/../../.." && pwd)/docker-compose.yml" ]; then
+    echo "Copying docker-compose.yml to VM..."
+    gcloud compute scp --zone=$ZONE "$(cd "$(dirname "$0")/../../.." && pwd)/docker-compose.yml" $VM_NAME:'~/iot-nest-firmware/'
+fi
+
+# Copy bash directory
+if [ -d "$(cd "$(dirname "$0")/../../.." && pwd)/bash" ]; then
+    echo "Copying bash directory to VM..."
+    gcloud compute scp --recurse --zone=$ZONE "$(cd "$(dirname "$0")/../../.." && pwd)/bash/" $VM_NAME:'~/iot-nest-firmware/' --compress
+fi
+
+# Create zigbee2mqtt config directory on VM
+echo "Creating zigbee2mqtt config directory on VM..."
+gcloud compute ssh $VM_NAME --zone=$ZONE --command='mkdir -p ~/.config/zigbee2mqtt/zigbee2mqtt-data'
+
+# Copy zigbee2mqtt configuration
+if [ -f "$(cd "$(dirname "$0")/../../.." && pwd)/zigbee2mqtt-configuration-example.yaml" ]; then
+    echo "Copying zigbee2mqtt configuration to VM..."
+    gcloud compute scp --zone=$ZONE "$(cd "$(dirname "$0")/../../.." && pwd)/zigbee2mqtt-configuration-example.yaml" $VM_NAME:~/.config/zigbee2mqtt/zigbee2mqtt-data/configuration.yaml
+fi
+
 echo "Copy complete."
