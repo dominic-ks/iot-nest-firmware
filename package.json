@@ -3,8 +3,8 @@
   "version": "0.1.1",
   "description": "",
   "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "private": false,
   "scripts": {
     "copy:python": "cp -r src/python/*.py dist/python",
     "prebuild": "rimraf dist",
