@@ -1,103 +1,58 @@
-# IOT NEST FIRMWARE
+# IoT Nest Firmware
 
-## To do
- - Organise this file
- 
-## Forward USB to WSL
- - https://learn.microsoft.com/en-us/windows/wsl/connect-usb
- - Run `sudo modprobe vhci_hcd` in WSL first
- - List USB devices in Windows: `usbipd list`
- - Bind USB device: `usbipd bind --busid <busid>`
- - Attach USB device to WSL: `usbipd attach --wsl --busid <busid>`
+A NestJS-based IoT firmware application designed for Raspberry Pi and similar devices. It integrates with various sensors and devices (e.g., DHT22, PMS5003, Zigbee2MQTT) and communicates via MQTT, with support for Google Cloud IoT Core.
 
-## A note on various configs required on the host
- - NB! neither gcloud cli nor docker-credential-gcr work on 32bit arm (raspberry pi zero for example)
- - https://github.com/GoogleCloudPlatform/docker-credential-gcr - is required to setup auth with no gcloud sdk and add entries to ~/.docker/config.json using $ docker-credential-gcr configure-docker --registries="europe-west2-docker.pkg.dev"
- - https://github.com/containrrr/watchtower/issues/119#issuecomment-593833358 - explains how to use this with the Watchtower image
- - ~/.config/device/ needs to contain the .env and the IOT Core certificate
- - ~/.config/zigbee2mqtt/zigbee2mqtt-data/ needs to contain configuration.yaml to configure the mqtt
- - ~/.config/gcloud/application_default_credentials.json needs to contain the gcloud private key
- - The ./bash folder contains other scripts that come in handy
- - docker and docker compose, obviously...
- - the registry has been made public with this: gcloud artifacts repositories add-iam-policy-binding iot-nest-firmware --location=europe-west2 --member=allUsers --role=artifactregistry.repositories.downloadArtifacts
- - the registry can be made private like this: gcloud artifacts repositories remove-iam-policy-binding iot-nest-firmware --location=europe-west2 --member=allUsers --role=artifactregistry.repositories.downloadArtifacts
+## Features
 
+- **Device Integration**: Supports multiple IoT devices including temperature/humidity sensors, air quality monitors, and Zigbee devices.
+- **MQTT Communication**: Publishes sensor data and handles device commands via MQTT.
+- **Google Cloud IoT Core**: Optional integration for cloud-based device management.
+- **Docker Support**: Easy deployment using Docker Compose.
+- **Hardware Abstraction**: Works with GPIO, serial ports, and USB devices.
 
+## Prerequisites
 
-<!-------------------------------->
-<!-------------------------------->
-<!-------------------------------->
-
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Node.js (v14 or later)
+- Python 3.8+ (for sensor scripts)
+- Docker and Docker Compose
+- Raspberry Pi or compatible hardware (for GPIO/serial access)
+- Google Cloud account (optional, for IoT Core integration)
 
 ## Installation
 
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/iot-nest-firmware.git
+   cd iot-nest-firmware
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   pip install -r py-requirements.txt
+   ```
+
+3. Copy the environment file and configure it:
+   ```bash
+   cp .env-example .env
+   # Edit .env with your specific values
+   ```
+
+4. Build the application:
+   ```bash
+   npm run build
+   ```
+
+## Configuration
+
+- Edit `.env` based on `.env-example`.
+- For Google Cloud IoT Core, set up your project, registry, and device as per [Google's documentation](https://cloud.google.com/iot/docs).
+- Configure Zigbee2MQTT if using Zigbee devices (see `zigbee2mqtt-configuration-example.yaml`).
+
+## Usage
+
+### Development
+
 ```bash
-$ npm install
-```
-
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+# Start in development mode with watch
+npm run start:dev
