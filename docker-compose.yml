@@ -1,7 +1,10 @@
 version: '3.8'
 services:
   app:
-    image: europe-west2-docker.pkg.dev/iot-projects-309015/iot-nest-firmware/bdvs/iot-nest-firmware:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.App
+    image: iot-nest-firmware:latest
     profiles: 
       - app
     restart: always
