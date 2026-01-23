@@ -18,9 +18,8 @@ jobs:
           python-version: '3.8'
       - run: npm ci
       - run: npm run build:prod
-      - run: bash bash/setup-python.sh
       - name: Package app
-        run: tar -czf app.tar.gz dist/ node_modules/ python-venv/
+        run: tar -czf app.tar.gz dist/ node_modules/ bash/setup-python.sh
       - uses: softprops/action-gh-release@v1
         with:
           files: app.tar.gz
