@@ -102,6 +102,7 @@ if $COMMAND up -d; then
     echo "Deployment successful"
     
     # Rotate directories
+    cd "$DEPLOY_ROOT"
     rm -rf previous-2 2>/dev/null || true
     [ -d previous ] && mv previous previous-2
     [ -d current ] && mv current previous
