@@ -1,10 +1,7 @@
 version: '3.8'
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile.App
-    image: iot-nest-firmware:latest
+    image: node:18-alpine
     profiles: 
       - app
     restart: always
@@ -13,9 +10,15 @@ services:
       - /dev/gpiomem:/dev/gpiomem
     volumes:
       - ~/.config/device/:/config
+      - /opt/myapp/current:/app
     working_dir: /app/dist
-    command: node /app/dist/main
+    command: node main.js
     env_file: ~/.config/device/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   mqtt:
     image: eclipse-mosquitto:2.0

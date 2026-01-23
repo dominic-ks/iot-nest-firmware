@@ -19,7 +19,7 @@ jobs:
       - run: npm ci
       - run: npm run build:prod
       - name: Package app
-        run: tar -czf app.tar.gz dist/ node_modules/ bash/setup-python.sh
+        run: tar -czf app.tar.gz dist/ node_modules/ bash/setup-python.sh docker-compose.yml
       - uses: softprops/action-gh-release@v1
         with:
           files: app.tar.gz

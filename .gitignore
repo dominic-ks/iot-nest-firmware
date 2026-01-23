@@ -3,6 +3,9 @@
 /node_modules
 /python-venv
 
+# test staging
+test-staging/
+
 # Logs
 logs
 *.log
