@@ -113,7 +113,6 @@ export class MqttHandlerService {
       this.connectionArgs.clean = true;
     }
 
-    console.log( 'Attempting connection to: ' , JSON.stringify( this.connectionArgs ));
     this.mqttClient = mqtt.connect( this.connectionArgs );
 
     this.mqttClient.subscribe( 'devices/' + this.deviceId + '/config' , { qos: 1 });
