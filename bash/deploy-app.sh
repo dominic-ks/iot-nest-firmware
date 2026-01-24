@@ -2,6 +2,11 @@
 
 set -e
 
+# Load device configuration
+if [ -f ~/.config/device/.env ]; then
+    export $(egrep -v '^#' ~/.config/device/.env | xargs)
+fi
+
 # Configuration
 REPO_OWNER="dominic-ks"  # Replace with actual owner
 REPO_NAME="iot-nest-firmware"      # Replace with actual repo name
