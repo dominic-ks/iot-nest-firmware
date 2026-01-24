@@ -53,11 +53,13 @@ download_and_unpack() {
 echo "Checking for updates..."
 
 LATEST_RELEASE_JSON=$(get_latest_release)
-echo "DEBUG: Release JSON (first 20 lines):"
-echo "$LATEST_RELEASE_JSON" | head -20
 LATEST_TAG=$(echo "$LATEST_RELEASE_JSON" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
 
-if [ -z "$LATEST_TAG" ]; then
+if [ "$LOCAL_BUILD" = "1" ]; then
+    LATEST_TAG="local"
+fi
+
+if [ -z "$LATEST_TAG" ] && [ "$LOCAL_BUILD" != "1" ]; then
     echo "Failed to get latest release"
     exit 1
 fi
@@ -70,7 +72,7 @@ fi
 echo "Current: $CURRENT_TAG"
 echo "Latest: $LATEST_TAG"
 
-if [ "$LATEST_TAG" = "$CURRENT_TAG" ]; then
+if [ "$LATEST_TAG" = "$CURRENT_TAG" ] && [ "$LOCAL_BUILD" != "1" ]; then
     echo "Already up to date"
     exit 0
 fi
@@ -85,32 +87,45 @@ fi
 
 echo "Deploying $LATEST_TAG"
 
-# Download to next/
-download_and_unpack "$DOWNLOAD_URL" "next"
+if [ "$LOCAL_BUILD" = "1" ]; then
+  # Files are mounted to next
+  cd "$DEPLOY_ROOT/next"
+else
+  download_and_unpack "$DOWNLOAD_URL" "next"
+fi
+
+# Rotate directories
+cd "$DEPLOY_ROOT"
+rm -rf previous-2 2>/dev/null || true
+if [ -d current ]; then
+  [ -d previous ] && mv previous previous-2
+  mv current previous
+fi
+mv next current
 
 # Build docker compose command with profiles
 IFS='|' read -r -a array <<< "$DOCKERPROFILES"
-COMMAND="docker compose -f $DEPLOY_ROOT/next/docker-compose.yml"
+COMMAND="docker compose -f $DEPLOY_ROOT/current/docker-compose.yml"
 
 for ELEMENT in "${array[@]}"
 do
     COMMAND="$COMMAND --profile $ELEMENT"
 done
 
+# Stop any existing containers first to ensure clean volume mount
+$COMMAND down 2>/dev/null || true
+
 # Attempt to start services
 if $COMMAND up -d; then
     echo "Deployment successful"
     
-    # Rotate directories
-    cd "$DEPLOY_ROOT"
-    rm -rf previous-2 2>/dev/null || true
-    [ -d previous ] && mv previous previous-2
-    [ -d current ] && mv current previous
-    mv next current
-    
     echo "$LATEST_TAG" > VERSION
 else
-    echo "Failed to start services, cleaning up"
-    rm -rf next
+    echo "Failed to start services, rolling back"
+    # Rollback
+    mv current next
+    if [ -d previous ]; then
+      mv previous current
+    fi
     exit 1
 fi

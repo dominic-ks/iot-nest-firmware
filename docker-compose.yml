@@ -11,14 +11,9 @@ services:
     volumes:
       - ~/.config/device/:/config
       - /opt/myapp/current:/app
-    working_dir: /app/dist
-    command: node main.js
+    working_dir: /app
+    command: ["node", "dist/main.js"]
     env_file: ~/.config/device/.env
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   mqtt:
     image: eclipse-mosquitto:2.0
@@ -47,11 +42,3 @@ services:
       - TZ=Europe/London
     devices:
       - /dev/ttyACM0:/dev/ttyACM0
-
-  watchtower:
-    image: containrrr/watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    profiles: 
-      - app
-    restart: always
