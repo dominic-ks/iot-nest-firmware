@@ -10,16 +10,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build TypeScript app
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
+      
       - run: npm ci
       - run: npm run build:prod
+      
+      - name: Build ARM64 Docker image and extract
+        run: |
+          docker buildx build \
+            --platform linux/arm64 \
+            --file Dockerfile.App \
+            --output type=local,dest=./build-output \
+            .
+      
       - name: Package app
-        run: tar -czf app.tar.gz dist/ node_modules/ bash/setup-python.sh docker-compose.yml
+        run: |
+          mkdir -p release
+          cp -r build-output/app/node_modules release/
+          cp -r dist release/
+          cp docker-compose.yml release/
+          cp -r bash release/
+          tar -czf app.tar.gz -C release .
+      
       - uses: softprops/action-gh-release@v1
         with:
           files: app.tar.gz

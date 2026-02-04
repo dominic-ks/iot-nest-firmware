@@ -2,6 +2,17 @@
 
 set -e
 
+# Verify architecture
+ARCH=$(uname -m)
+if [ "$ARCH" != "aarch64" ] && [ "$ARCH" != "arm64" ]; then
+    echo "Warning: This deployment is built for ARM64, but system is $ARCH"
+    read -p "Continue anyway? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
+
 # Load device configuration
 if [ -f ~/.config/device/.env ]; then
     export $(egrep -v '^#' ~/.config/device/.env | xargs)
