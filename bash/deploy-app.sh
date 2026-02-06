@@ -136,6 +136,14 @@ if $COMMAND up -d; then
     echo "Deployment successful"
     
     echo "$LATEST_TAG" > VERSION
+    
+    # Add hourly cron job if not exists
+    SCRIPT_PATH="$DEPLOY_ROOT/current/bash/deploy-app.sh"
+    CRON_LINE="0 * * * * $SCRIPT_PATH"
+    if ! crontab -l 2>/dev/null | grep -q "$SCRIPT_PATH"; then
+        (crontab -l 2>/dev/null; echo "$CRON_LINE") | crontab -
+        echo "Added hourly cron job for updates"
+    fi
 else
     echo "Failed to start services, rolling back"
     # Rollback
