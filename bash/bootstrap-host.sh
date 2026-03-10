@@ -6,6 +6,7 @@ set -e
 # Run once on fresh RPi/VM
 
 DEPLOY_ROOT="${DEPLOY_ROOT:-/opt/myapp}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "Installing Docker..."
 
@@ -24,6 +25,9 @@ sudo usermod -aG docker $USER
 echo "Creating deploy directory..."
 sudo mkdir -p "$DEPLOY_ROOT"
 sudo chown "$USER":"$USER" "$DEPLOY_ROOT"
+
+echo "Configuring reverse SSH tunnel..."
+"$SCRIPT_DIR/setup-reverse-ssh.sh"
 
 # Optional: Set up cron for periodic updates
 # Uncomment to enable
