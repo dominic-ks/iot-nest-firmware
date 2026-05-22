@@ -56,3 +56,10 @@ A NestJS-based IoT firmware application designed for Raspberry Pi and similar de
 ```bash
 # Start in development mode with watch
 npm run start:dev
+
+## Handy: Forward USB to WSL
+ - https://learn.microsoft.com/en-us/windows/wsl/connect-usb
+ - Run `sudo modprobe vhci_hcd` in WSL first
+ - List USB devices in Windows: `usbipd list`
+ - Bind USB device: `usbipd bind --busid <busid>`
+ - Attach USB device to WSL: `usbipd attach --wsl --busid <busid>`
