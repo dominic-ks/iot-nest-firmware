@@ -12,6 +12,7 @@ import { Pms5003SerialService } from '../pms5003-serial/pms5003-serial.service';
 import { Mics6814SerialService } from '../mics6814-serial/mics6814-serial.service';
 import { Mq135SerialService } from '../mq135-serial/mq135-serial.service';
 import { Dht22SerialService } from '../dht22-serial/dht22-serial.service';
+import { Bme680SerialService } from '../bme680-serial/bme680-serial.service';
 import { SonoffTempHumiditySensorService } from '../sonoff-temp-humidity-sensor/sonoff-temp-humidity-sensor.service';
 import { VirtualThermostatService } from '../virtual-thermostat/virtual-thermostat.service';
 import { UtilityService } from '../utility/utility.service';
@@ -107,6 +108,7 @@ export class DevicesService {
     return [
       { type: 'daikin-ac-unit' , class: DaikinAcService },
       { type: 'dht22' , class: Dht22DeviceService },
+      { type: 'bme680-serial' , class: Bme680SerialService },
       { type: 'dht22-serial' , class: Dht22SerialService },
       { type: 'dummy-device' , class: DummyDeviceService },
       { type: 'FWBulb02UK' , class: HiveBulbService },
