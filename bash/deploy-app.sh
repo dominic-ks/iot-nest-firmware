@@ -155,12 +155,16 @@ if $COMMAND up -d; then
     echo "Setting up DHT22 reader..."
     bash "$DEPLOY_ROOT/current/bash/setup-python.sh" || echo "Warning: DHT22 reader setup failed"
 
-    # Add hourly cron job if not exists
+    # Check for updates hourly and shortly after boot (so a freshly flashed device catches up)
     SCRIPT_PATH="$DEPLOY_ROOT/current/bash/deploy-app.sh"
-    CRON_LINE="0 * * * * $SCRIPT_PATH"
-    if ! crontab -l 2>/dev/null | grep -q "$SCRIPT_PATH"; then
-        (crontab -l 2>/dev/null; echo "$CRON_LINE") | crontab -
+    LOG_REDIRECT='>> $HOME/deploy.log 2>&1'
+    if ! crontab -l 2>/dev/null | grep -q "^0 \* \* \* \* $SCRIPT_PATH"; then
+        (crontab -l 2>/dev/null; echo "0 * * * * $SCRIPT_PATH $LOG_REDIRECT") | crontab -
         echo "Added hourly cron job for updates"
+    fi
+    if ! crontab -l 2>/dev/null | grep -q "^@reboot sleep [0-9]* && $SCRIPT_PATH"; then
+        (crontab -l 2>/dev/null; echo "@reboot sleep 120 && $SCRIPT_PATH $LOG_REDIRECT") | crontab -
+        echo "Added on-boot cron job for updates"
     fi
 else
     echo "Failed to start services, rolling back"
