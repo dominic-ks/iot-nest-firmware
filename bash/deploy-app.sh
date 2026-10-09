@@ -57,12 +57,6 @@ download_and_unpack() {
     echo "Unpacking..."
     tar -xzf app.tar.gz
     rm app.tar.gz
-    
-    # Set up Python venv on device
-    if [ -f "setup-python.sh" ]; then
-        echo "Setting up Python environment..."
-        bash setup-python.sh
-    fi
 }
 
 # Main logic
@@ -110,6 +104,14 @@ else
   download_and_unpack "$DOWNLOAD_URL" "next"
 fi
 
+# Stop host-side reader from previous deployment if running.
+if [ -f "$DEPLOY_ROOT/current/.dht22-reader.pid" ]; then
+  OLD_DHT22_PID=$(cat "$DEPLOY_ROOT/current/.dht22-reader.pid")
+  if ps -p "$OLD_DHT22_PID" >/dev/null 2>&1; then
+    kill "$OLD_DHT22_PID" || true
+  fi
+fi
+
 # Rotate directories
 cd "$DEPLOY_ROOT"
 rm -rf previous-2 2>/dev/null || true
@@ -118,6 +120,18 @@ if [ -d current ]; then
   mv current previous
 fi
 mv next current
+
+Z2M_CONFIG_DIR="$HOME/.config/zigbee2mqtt/zigbee2mqtt-data"
+Z2M_CONFIG_FILE="$Z2M_CONFIG_DIR/configuration.yaml"
+Z2M_EXAMPLE_FILE="$DEPLOY_ROOT/current/zigbee2mqtt-configuration-example.yaml"
+
+if [ -f "$Z2M_EXAMPLE_FILE" ]; then
+        mkdir -p "$Z2M_CONFIG_DIR"
+        if [ ! -f "$Z2M_CONFIG_FILE" ]; then
+                cp "$Z2M_EXAMPLE_FILE" "$Z2M_CONFIG_FILE"
+                echo "Created Zigbee2MQTT config at $Z2M_CONFIG_FILE"
+        fi
+fi
 
 # Build docker compose command with profiles
 IFS='|' read -r -a array <<< "$DOCKERPROFILES"
@@ -136,7 +150,11 @@ if $COMMAND up -d; then
     echo "Deployment successful"
     
     echo "$LATEST_TAG" > VERSION
-    
+
+    # Start the host-side DHT22 reader for the new release (the old one was stopped above).
+    echo "Setting up DHT22 reader..."
+    bash "$DEPLOY_ROOT/current/bash/setup-python.sh" || echo "Warning: DHT22 reader setup failed"
+
     # Add hourly cron job if not exists
     SCRIPT_PATH="$DEPLOY_ROOT/current/bash/deploy-app.sh"
     CRON_LINE="0 * * * * $SCRIPT_PATH"
@@ -150,6 +168,7 @@ else
     mv current next
     if [ -d previous ]; then
       mv previous current
+      bash "$DEPLOY_ROOT/current/bash/setup-python.sh" --start-only || true
     fi
     exit 1
 fi

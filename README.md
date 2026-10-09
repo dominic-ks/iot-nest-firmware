@@ -14,6 +14,7 @@ A NestJS-based IoT firmware application designed for Raspberry Pi and similar de
 
 - Node.js (v14 or later)
 - Python 3.8+ (for sensor scripts)
+- For the DHT22 reader on a Raspberry Pi: the kernel DHT driver enabled with `dtoverlay=dht11,gpiopin=4` in `/boot/firmware/config.txt` (`bash/bootstrap-host.sh` adds this; reboot afterwards)
 - Docker and Docker Compose
 - Raspberry Pi or compatible hardware (for GPIO/serial access)
 - Google Cloud account (optional, for IoT Core integration)
@@ -47,7 +48,11 @@ A NestJS-based IoT firmware application designed for Raspberry Pi and similar de
 
 - Edit `.env` based on `.env-example`.
 - For Google Cloud IoT Core, set up your project, registry, and device as per [Google's documentation](https://cloud.google.com/iot/docs).
-- Configure Zigbee2MQTT if using Zigbee devices (see `zigbee2mqtt-configuration-example.yaml`).
+- Configure Zigbee2MQTT if using Zigbee devices:
+   - Copy `zigbee2mqtt-configuration-example.yaml` to `~/.config/zigbee2mqtt/zigbee2mqtt-data/configuration.yaml`.
+   - Update the coordinator `serial.port` and `serial.adapter` values for your hardware.
+   - If your MQTT broker requires authentication, set `mqtt.user` and `mqtt.password`.
+   - The example enables the Zigbee2MQTT frontend on container port `8080`; this repo publishes it on host port `8081` via Docker Compose.
 
 ## Usage
 

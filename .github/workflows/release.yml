@@ -40,6 +40,8 @@ jobs:
           cp -r dist release/
           cp docker-compose.yml release/
           cp -r bash release/
+          cp py-requirements.txt release/
+          cp zigbee2mqtt-configuration-example.yaml release/
           tar -czf app.tar.gz -C release .
       
       - uses: softprops/action-gh-release@v1

@@ -17,7 +17,7 @@ sudo chown -R $(whoami):$(whoami) "$DEPLOY_ROOT"
 
 # Build locally
 cd "$(dirname "$SCRIPT_DIR")"
-npm run build
+npm run build:prod
 
 # Run in container
 docker run --rm \
@@ -38,7 +38,9 @@ docker run --rm \
     cp -r /host/dist /opt/myapp/next/ &&
     cp -r /host/node_modules /opt/myapp/next/ &&
     cp /host/docker-compose.yml /opt/myapp/next/ &&
-    cp /host/bash/setup-python.sh /opt/myapp/next/ &&
+    cp -r /host/bash /opt/myapp/next/ &&
+    cp /host/py-requirements.txt /opt/myapp/next/ &&
+    cp /host/zigbee2mqtt-configuration-example.yaml /opt/myapp/next/ &&
     chmod +x /deploy-app.sh &&
     /deploy-app.sh
   "

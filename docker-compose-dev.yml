@@ -9,6 +9,8 @@ services:
     working_dir: /app
     command: npm run start:dev
     env_file: ./.env
+    environment:
+      DHT22_READING_FILE: /app/dht22_readings.json
     # devices:
     #   - /dev/ttyACM0:/dev/ttyACM0
     network_mode: host
