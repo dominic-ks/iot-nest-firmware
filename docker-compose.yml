@@ -13,10 +13,13 @@ services:
     working_dir: /app
     command: ["node", "dist/main.js"]
     env_file: ~/.config/device/.env
+    environment:
+      DHT22_READING_FILE: /app/dht22_readings.json
 
   mqtt:
     image: eclipse-mosquitto:2.0
-    profiles: 
+    restart: always
+    profiles:
       - mqtt
     volumes:
       - "~/.config/mosquitto/mosquitto-data:/mosquitto"

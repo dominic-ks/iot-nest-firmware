@@ -33,7 +33,7 @@ export class Dht22DeviceService implements VirtualDevice {
   ) {
     this.appMessagesService = this.utilityService.appMessagesService;
     this.configService = this.utilityService.configService;
-    this.filePath = path.join(__dirname, '../../../dht22_readings.json');
+    this.filePath = process.env.DHT22_READING_FILE || path.join(process.cwd(), 'dht22_readings.json');
   }
 
   executeDeviceCommand(commandData: any): void {

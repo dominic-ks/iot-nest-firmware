@@ -6,10 +6,10 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "copy:python": "cp -r src/python/*.py dist/python",
+    "copy:python": "mkdir -p dist/python && cp src/python/*.py dist/python/",
     "prebuild": "rimraf dist",
     "build": "nest build",
-    "build:prod": "rimraf dist && tsc -p tsconfig.build.json",
+    "build:prod": "rimraf dist && tsc -p tsconfig.build.json && npm run copy:python",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "docker compose -f docker-compose-dev.yml --profile app up",
     "start:mqtt": "docker compose -f docker-compose-dev.yml --profile app --profile mqtt up",

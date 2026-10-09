@@ -26,6 +26,14 @@ echo "Creating deploy directory..."
 sudo mkdir -p "$DEPLOY_ROOT"
 sudo chown "$USER":"$USER" "$DEPLOY_ROOT"
 
+echo "Enabling DHT22 kernel driver on GPIO4..."
+BOOT_CONFIG=/boot/firmware/config.txt
+[ -f "$BOOT_CONFIG" ] || BOOT_CONFIG=/boot/config.txt
+if [ -f "$BOOT_CONFIG" ] && ! grep -q "^dtoverlay=dht11" "$BOOT_CONFIG"; then
+    echo "dtoverlay=dht11,gpiopin=4" | sudo tee -a "$BOOT_CONFIG" >/dev/null
+    echo "DHT22 overlay added; reboot required before readings are available."
+fi
+
 echo "Configuring reverse SSH tunnel..."
 "$SCRIPT_DIR/setup-reverse-ssh.sh"
 
