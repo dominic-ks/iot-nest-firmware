@@ -53,4 +53,6 @@ services:
     environment:
       - TZ=Europe/London
     devices:
-      - /dev/ttyACM0:/dev/ttyACM0
+      # Host path of the Zigbee coordinator (e.g. /dev/ttyUSB0 for a Sonoff ZBDongle);
+      # it always appears as /dev/ttyACM0 inside the container, matching the z2m config.
+      - ${ZIGBEE_ADAPTER:-/dev/ttyACM0}:/dev/ttyACM0

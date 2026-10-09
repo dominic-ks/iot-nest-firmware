@@ -32,6 +32,7 @@ export class DevicesService {
   private appMessagesService: AppMessagesService
   private devices = new BehaviorSubject( null );
   private devicesStore: VirtualDevice[] = [];
+  private warnedUnsupportedDevices = new Set<string>();
 
   public currentDevices = this.devices.asObservable();
 
@@ -69,6 +70,16 @@ export class DevicesService {
     }
 
     catch( e ) {
+      // Zigbee devices without a handler (e.g. a paired wall thermostat) reappear on every
+      // bridge/devices update; warn once per device instead of logging an error each time.
+      if( typeof( e ) === 'string' && e.startsWith( 'Unable to find a registered interface' )) {
+        if( ! this.warnedUnsupportedDevices.has( device.id )) {
+          this.warnedUnsupportedDevices.add( device.id );
+          console.warn( e + ' (ignoring)' );
+        }
+        return;
+      }
+
       console.error( e );
     }
 

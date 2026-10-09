@@ -24,6 +24,9 @@ export class Zigbee2mqttService implements VirtualDevice {
   public deviceInfo: Device;
 
   private attachedDevices: ZigbeeDeviceList[];
+  // One handler per device ID, matched on the exact topic, so renaming a device in
+  // Zigbee2MQTT doesn't break matching and re-subscribing doesn't stack listeners.
+  private deviceHandlers = new Map<string, { topic: string, callback: Function }>();
   private appMessagesService: AppMessagesService;
   private mqttClient: MqttClient;
 
@@ -116,8 +119,15 @@ export class Zigbee2mqttService implements VirtualDevice {
       return;
     }
 
-    this.mqttClient.subscribe( 'zigbee2mqtt/' + attachedDevice.friendly_name , { qos: 0 });
-    this.mqttClient.on( 'message' , callback );
+    const topic = 'zigbee2mqtt/' + attachedDevice.friendly_name;
+    const existing = this.deviceHandlers.get( device.id );
+
+    if( existing && existing.topic !== topic ) {
+      this.mqttClient.unsubscribe( existing.topic );
+    }
+
+    this.deviceHandlers.set( device.id , { topic , callback });
+    this.mqttClient.subscribe( topic , { qos: 0 });
 
   }
 
@@ -139,6 +149,17 @@ export class Zigbee2mqttService implements VirtualDevice {
 
   onMessage( topic: string , message: string ): void {
 
+    for( const handler of this.deviceHandlers.values() ) {
+      if( handler.topic !== topic ) {
+        continue;
+      }
+
+      try {
+        handler.callback( topic , message );
+      } catch( error ) {
+        console.error( 'Zigbee device handler failed for topic ' + topic , error );
+      }
+    }
 
     try {
       const decodedMessage = JSON.parse( Buffer.from( message , 'base64' ).toString( 'utf8' ));
