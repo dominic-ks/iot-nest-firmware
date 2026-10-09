@@ -89,10 +89,6 @@ export class SonoffTempHumiditySensorService implements VirtualDevice {
 
     this.zigbee2mqttService.mqttSubscribe( this.deviceInfo , ( topic: string , message: string ) => {
 
-      if( topic.indexOf( this.deviceInfo.id ) === -1 ) {
-        return;
-      }
-
       const decodedMessage = JSON.parse( Buffer.from( message , 'base64' ).toString( 'ascii' ));
       this.mqttResponseSubject.next( decodedMessage );
 

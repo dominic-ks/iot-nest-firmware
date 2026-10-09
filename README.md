@@ -67,6 +67,36 @@ A 16GB A1/A2 microSD is plenty (8GB works; the footprint is ~3.5GB).
 3. Copy `bash/` to the device and run `sudo bash bash/bootstrap-host.sh`. It installs Docker and `python3-venv`, creates `/opt/myapp`, enables the DHT22 overlay, caps the swap file at 512MB, and sets up the tunnel if the key exists.
 4. Reboot, then run `bash bash/deploy-app.sh` as `pi`. It installs the latest release, starts the containers and the DHT22 reader, and adds cron jobs that check for updates hourly and at boot.
 
+If the Zigbee coordinator isn't at `/dev/ttyACM0` (Sonoff ZBDongle-P/E show up as `/dev/ttyUSB0`), set `ZIGBEE_ADAPTER` in the device `.env`.
+
+## Remote access (reverse SSH tunnel)
+
+Devices sit behind home routers, so instead of opening ports, each device keeps an **outbound** SSH connection to our tunnel server. Over that connection it asks the server to forward a port back to the device's own SSH:
+
+```
+you ──ssh──▶ tunnel server :REVERSE_SSH_REMOTE_PORT ──(through the tunnel)──▶ device :22
+                       ▲
+device ──autossh (outbound, reconnects automatically)──┘
+```
+
+`bash/setup-reverse-ssh.sh` (run by `bootstrap-host.sh` when `~/.ssh/id_rsa` exists) installs `autossh` and a systemd service, `device-reverse-ssh`, which runs `autossh -N -R REMOTE_PORT:localhost:22 USER@HOST` using the device key `~/.ssh/id_rsa`.
+
+**Per device, set in `~/.config/device/.env`:**
+
+| Key | Meaning |
+|---|---|
+| `REVERSE_SSH_HOST` | Tunnel server hostname |
+| `REVERSE_SSH_PORT` | SSH port on the tunnel server (usually 22) |
+| `REVERSE_SSH_USER` | Account on the tunnel server that devices log in as |
+| `REVERSE_SSH_REMOTE_PORT` | Port on the server for this device; must be unique per device |
+| `REVERSE_SSH_LOCAL_PORT` | Device port to expose (22) |
+
+**On the tunnel server:** add the device's public key (`~/.ssh/id_rsa.pub`) to `REVERSE_SSH_USER`'s `~/.ssh/authorized_keys`, ideally restricted with `restrict,port-forwarding`.
+
+**Apply changes:** `sudo systemctl restart device-reverse-ssh`. Check with `systemctl status device-reverse-ssh`.
+
+**Connect to a device:** `ssh -J <you>@<tunnel host> -p <REVERSE_SSH_REMOTE_PORT> pi@localhost`
+
 ## Usage
 
 ### Development

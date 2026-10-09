@@ -1,4 +1,4 @@
-import { Injectable , OnModuleInit , OnModuleDestroy , Logger } from '@nestjs/common';
+import { Injectable , OnModuleDestroy , Logger } from '@nestjs/common';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { SerialPort } from 'serialport';
 import { ReadlineParser } from '@serialport/parser-readline'; // Import ReadlineParser correctly
@@ -7,19 +7,21 @@ import { SerialDeviceRequest } from 'src/classes/serial-device-request/serial-de
 import { SerialDeviceResponse } from 'src/classes/serial-device-response/serial-device-response';
 
 @Injectable()
-export class SerialConnectorService implements OnModuleInit , OnModuleDestroy {
+export class SerialConnectorService implements OnModuleDestroy {
 
   private messageStreamSubject = new BehaviorSubject<SerialDeviceResponse>( null );
   private port: SerialPort;
   private parser: ReadlineParser;
   private readonly logger = new Logger( SerialConnectorService.name );
 
-  private readonly serialPortPath = '/dev/ttyACM0';
+  // Opened lazily on first use, so devices without serial sensors never touch the port
+  // (on device-003 /dev/ttyACM0 is the Zigbee coordinator).
+  private readonly serialPortPath = process.env.SERIAL_DEVICE_PATH || '/dev/ttyACM0';
   private readonly baudRate = 9600;
 
   public messageStream$: Observable<SerialDeviceResponse> = this.messageStreamSubject.asObservable();
 
-  async onModuleInit() {
+  private openPort(): void {
     this.port = new SerialPort({
       path: this.serialPortPath,
       baudRate: this.baudRate,
@@ -58,7 +60,7 @@ export class SerialConnectorService implements OnModuleInit , OnModuleDestroy {
     const message = JSON.stringify( request );
 
     if( typeof( this.port ) === 'undefined' ) {
-      this.onModuleInit();
+      this.openPort();
     }
 
     this.port.write( message + '\r\n' , ( err ) => {
