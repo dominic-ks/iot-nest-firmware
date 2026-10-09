@@ -1,3 +1,10 @@
+# Cap container logs so they can't fill a small SD card
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   app:
     image: node:18-alpine
@@ -5,6 +12,7 @@ services:
       - app
     restart: always
     privileged: true
+    logging: *default-logging
     devices:
       - /dev/gpiomem:/dev/gpiomem
     volumes:
@@ -19,6 +27,7 @@ services:
   mqtt:
     image: eclipse-mosquitto:2.0
     restart: always
+    logging: *default-logging
     profiles:
       - mqtt
     volumes:
@@ -32,6 +41,7 @@ services:
     depends_on:
       - mqtt
     restart: always
+    logging: *default-logging
     image: koenkk/zigbee2mqtt:2.6.2
     profiles: 
       - mqtt
