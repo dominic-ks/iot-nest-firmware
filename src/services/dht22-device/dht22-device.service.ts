@@ -9,6 +9,18 @@ import { Device } from '../../classes/device/device';
 
 import { VirtualDevice } from '../../interfaces/virtual-device.interface';
 
+// Linear correction for sensors that drift: corrected = slope * raw + intercept, clamped to [min, max].
+// Calibrate against a reference sensor, e.g. DHT22_HUM_SLOPE / DHT22_HUM_INTERCEPT in the device .env.
+export function applyLinearCalibration(raw: number, slope: number, intercept: number, min: number, max: number): number {
+  const corrected = slope * raw + intercept;
+  return Math.round(Math.min(max, Math.max(min, corrected)) * 10) / 10;
+}
+
+function envNumber(name: string, fallback: number): number {
+  const value = parseFloat(process.env[name] ?? '');
+  return Number.isFinite(value) ? value : fallback;
+}
+
 class Dht22Device extends Device {
   data: {
     temp?: number;
@@ -27,6 +39,9 @@ export class Dht22DeviceService implements VirtualDevice {
   public deviceInfo: Dht22Device;
   private intervalId: NodeJS.Timeout | null = null;
   private filePath: string;
+  private humSlope: number;
+  private humIntercept: number;
+  private tempOffset: number;
 
   constructor(
     private utilityService: UtilityService,
@@ -34,6 +49,9 @@ export class Dht22DeviceService implements VirtualDevice {
     this.appMessagesService = this.utilityService.appMessagesService;
     this.configService = this.utilityService.configService;
     this.filePath = process.env.DHT22_READING_FILE || path.join(process.cwd(), 'dht22_readings.json');
+    this.humSlope = envNumber('DHT22_HUM_SLOPE', 1);
+    this.humIntercept = envNumber('DHT22_HUM_INTERCEPT', 0);
+    this.tempOffset = envNumber('DHT22_TEMP_OFFSET', 0);
   }
 
   executeDeviceCommand(commandData: any): void {
@@ -51,8 +69,8 @@ export class Dht22DeviceService implements VirtualDevice {
       console.log('Reading:', reading);
       if (reading && typeof reading === 'object' && 'temp' in reading && 'hum' in reading && typeof reading.temp === 'number' && typeof reading.hum === 'number') {
         this.setDeviceData({
-          temp: reading.temp,
-          hum: reading.hum,
+          temp: applyLinearCalibration(reading.temp, 1, this.tempOffset, -40, 80),
+          hum: applyLinearCalibration(reading.hum, this.humSlope, this.humIntercept, 0, 100),
         });
       } else {
         console.warn('Invalid reading data:', reading);
