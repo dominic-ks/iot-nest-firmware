@@ -48,3 +48,5 @@ dht22_readings.json
 
 # docker
 docker
+# deployed version marker (written on devices by deploy-app.sh)
+VERSION
