@@ -55,9 +55,13 @@ if [ ! -f "\$ENV_FILE" ]; then
     exit 1
 fi
 
-set -a
-source "\$ENV_FILE"
-set +a
+# Read only the REVERSE_SSH_* settings; sourcing the whole .env breaks on unquoted
+# values with shell characters (e.g. passwords containing &).
+while IFS='=' read -r key value; do
+    value="\${value%\"}"; value="\${value#\"}"
+    value="\${value%\'}"; value="\${value#\'}"
+    export "\$key=\$value"
+done < <(grep -E '^REVERSE_SSH_[A-Z_]+=' "\$ENV_FILE")
 
 : "\${REVERSE_SSH_HOST:?REVERSE_SSH_HOST is required}"
 : "\${REVERSE_SSH_USER:?REVERSE_SSH_USER is required}"
