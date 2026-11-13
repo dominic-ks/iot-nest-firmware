@@ -31,6 +31,14 @@ export class SerialConnectorService implements OnModuleDestroy {
 
     this.parser.on( 'data' , ( data: string ) => {
 
+      // Sensor replies are JSON objects, one per line. Anything else the board prints
+      // on the serial line (such as an echo of the command it is running) is not a reply:
+      // log it for debugging and skip it.
+      if( ! data.trim().startsWith( '{' )) {
+        this.logger.debug( `Ignoring non-JSON serial line: ${data}` );
+        return;
+      }
+
       this.logger.log( `Received: ${data}` );
 
       try {
