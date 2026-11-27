@@ -97,6 +97,17 @@ device ──autossh (outbound, reconnects automatically)──┘
 
 **Connect to a device:** `ssh -J <you>@<tunnel host> -p <REVERSE_SSH_REMOTE_PORT> pi@localhost`
 
+### The old IP reporter is retired
+
+Earlier versions installed an hourly cron job (`bash/ip-reporter.sh`) that posted the device's public IP address to a
+web endpoint. It is no longer used: reach a device through the reverse SSH tunnel above. Devices that were set up with
+the old firmware may still have its cron line. Remove it with:
+
+```
+crontab -l | grep -v ip-reporter | crontab -
+crontab -l | grep -c ip-reporter   # should print 0
+```
+
 ## Usage
 
 ### Development
